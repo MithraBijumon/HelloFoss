@@ -1,0 +1,19 @@
+# Local development only — a throwaway Postgres for running the app and
+# `prisma migrate dev` against on your machine. Not used in production;
+# production runs against the Postgres resource provisioned on your own
+# server (see DEPLOYMENT.md).
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hellofoss
+      POSTGRES_PASSWORD: hellofoss
+      POSTGRES_DB: hellofoss
+    ports:
+      - "5432:5432"
+    volumes:
+      - hellofoss-dev-db:/var/lib/postgresql/data
+
+volumes:
+  hellofoss-dev-db:
