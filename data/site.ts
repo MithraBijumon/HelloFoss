@@ -3,7 +3,7 @@ export const siteConfig = {
   tagline: "Pan-IIT Open Source Initiative",
   description:
     "A Pan-IIT open-source initiative bringing students together to build and contribute to real-world open-source projects.",
-  url: "https://hellofoss.dev",
+  url: "https://hellofoss.tech-iitb.org",
   registerUrl: "#",
   nav: [
     { label: "Home", href: "/" },

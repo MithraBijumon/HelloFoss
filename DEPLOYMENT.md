@@ -45,7 +45,6 @@ full list with descriptions):
 | `ADMIN_EMAILS` | Comma-separated emails that should get ADMIN access |
 | `GAS_MAIL_WEBHOOK_URL` | **Required in production** — see warning below |
 | `GAS_MAIL_SECRET` | **Required in production** — see warning below |
-| `NEXT_PUBLIC_SITE_URL` | Your real domain, e.g. `https://hellofoss.dev` |
 
 **`GAS_MAIL_WEBHOOK_URL`/`GAS_MAIL_SECRET` are not optional in production.**
 When they're unset, [lib/email.ts](lib/email.ts) skips sending mail entirely
@@ -59,6 +58,9 @@ under — 100 emails/day on a personal gmail.com account, 1,500/day on a
 Google Workspace account.
 
 ## 5. Domain & TLS
+
+The site's public URL (used for SEO/link-preview tags) is set in
+`data/site.ts` — currently `https://hellofoss.tech-iitb.org`.
 
 Add your domain in the application's Coolify settings and enable HTTPS —
 Coolify provisions a Let's Encrypt certificate automatically via Traefik.
