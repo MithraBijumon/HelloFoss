@@ -1,7 +1,7 @@
 # Built for Coolify's Dockerfile buildpack. Keeps devDependencies in the
 # final image (notably the `prisma` CLI) so the container can run
 # `prisma migrate deploy` on startup without a separate deploy step.
-FROM node:20-bookworm-slim AS base
+FROM node:24-bookworm-slim AS base
 WORKDIR /app
 
 FROM base AS deps
@@ -18,6 +18,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # build time, but it does require DATABASE_URL to be a non-empty string.
 # The real value is injected by Coolify at runtime, not at build time.
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
+# The Prisma client is generated into ./generated (not node_modules), which
+# neither the deps stage's node_modules nor the build context carries over.
+RUN npx prisma generate
 RUN npm run build
 
 FROM base AS runner
