@@ -64,8 +64,18 @@ export interface CashPrize {
   description: string;
 }
 
+/** A rule marked `provisional` is a proposed default awaiting organiser confirmation. */
+export type Rule = string | { text: string; provisional: true };
+
 export interface RuleSection {
   id: string;
   title: string;
-  rules: string[];
+  intro?: string;
+  /** Marks every rule in the section as awaiting organiser confirmation. */
+  provisional?: boolean;
+  /** A single rule worth calling out above the rest. */
+  callout?: string;
+  rules: Rule[];
+  /** When set, `rules` render as the "Do" column next to these. */
+  donts?: string[];
 }
