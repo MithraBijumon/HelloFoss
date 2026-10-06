@@ -1,8 +1,9 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import { Check, Circle, Loader2 } from "lucide-react";
-import type { TimelineEvent } from "@/lib/types";
+import type { TimelineEvent, TimelineStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const statusConfig = {
@@ -14,7 +15,21 @@ const statusConfig = {
   },
 } as const;
 
+const noopSubscribe = () => () => {};
+// en-CA formats as YYYY-MM-DD in the viewer's local timezone.
+const todayIso = () => new Date().toLocaleDateString("en-CA");
+
+function statusFor(event: TimelineEvent, today: string | null): TimelineStatus {
+  if (!event.start || today === null) return event.status;
+  if (today < event.start) return "upcoming";
+  if (event.end && today > event.end) return "completed";
+  return "active";
+}
+
 export function TimelineList({ events }: { events: TimelineEvent[] }) {
+  // null on the server, so date-derived statuses only apply after hydration.
+  const today = useSyncExternalStore(noopSubscribe, todayIso, () => null);
+
   return (
     <ol className="relative flex flex-col gap-10 pl-10 sm:pl-14">
       <div
@@ -22,7 +37,7 @@ export function TimelineList({ events }: { events: TimelineEvent[] }) {
         aria-hidden="true"
       />
       {events.map((event, i) => {
-        const config = statusConfig[event.status];
+        const config = statusConfig[statusFor(event, today)];
         const Icon = config.icon;
         return (
           <motion.li

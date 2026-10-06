@@ -106,7 +106,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <h2 className="text-xl font-semibold">Contributing</h2>
             <p className="mt-3 text-pretty leading-relaxed text-muted">
               Explore the repository to understand the codebase, then browse
-              open issues to find one that matches your track. Submit a pull
+              open issues to find one that matches your skills. Submit a pull
               request following the project&apos;s contribution guidelines,
               and a mentor will review it and work with you until it&apos;s
               ready to merge.

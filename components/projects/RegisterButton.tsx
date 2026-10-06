@@ -57,7 +57,7 @@ export function RegisterButton({
           className={cn(buttonBaseClasses, buttonVariantClasses.secondary, buttonSizeClasses.md, "w-full")}
         >
           <Check className="h-4 w-4 text-accent" aria-hidden="true" />
-          {pending ? "Withdrawing…" : "Registered — withdraw"}
+          {pending ? "Withdrawing…" : "Registered · Withdraw"}
         </button>
         {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
       </div>

@@ -9,6 +9,34 @@ export async function getAdminSession(): Promise<SessionUser | null> {
   return session?.role === "ADMIN" ? session : null;
 }
 
+export type AdminMailSender = {
+  id: string;
+  label: string;
+  webhookUrl: string;
+  /** Only the last few characters; the full secret never leaves the server. */
+  secretHint: string;
+  enabled: boolean;
+  lastUsedAt: string | null;
+  lastError: string | null;
+  lastErrorAt: string | null;
+};
+
+export async function getAdminMailSenders(): Promise<AdminMailSender[]> {
+  const rows = await prisma.mailSender.findMany({
+    orderBy: [{ priority: "asc" }, { createdAt: "asc" }],
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    label: r.label,
+    webhookUrl: r.webhookUrl,
+    secretHint: `…${r.secret.slice(-4)}`,
+    enabled: r.enabled,
+    lastUsedAt: r.lastUsedAt?.toISOString() ?? null,
+    lastError: r.lastError,
+    lastErrorAt: r.lastErrorAt?.toISOString() ?? null,
+  }));
+}
+
 export type AdminUserRow = {
   id: string;
   name: string | null;

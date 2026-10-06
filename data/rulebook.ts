@@ -1,17 +1,19 @@
 import type { RuleSection } from "@/lib/types";
 
 /**
- * Hello FOSS 2026 Contributor Rulebook. Rules flagged `provisional` were
- * marked [TO CONFIRM] in the source rulebook — drop the flag (or the whole
- * rule) once organisers confirm them.
+ * Hello FOSS 2026 Contributor Rulebook. All rules are confirmed. To mark a
+ * new rule as not yet confirmed, write it as { text, provisional: true }
+ * (or set `provisional: true` on a section); the page tags it "TBC".
+ *
+ * User-facing copy here avoids em dashes by request.
  */
 
 /** The rules people most often get wrong, shown at the top of the page. */
 export const keyRules = [
   "Only work on issues a mentor has assigned to you.",
-  "One issue, one branch, one PR — linked with “Closes #N”.",
+  "One issue, one branch, one PR, linked with “Closes #N”.",
   "Only merged PRs score. Quality beats PR count.",
-  "Ask for help in public channels — don't DM mentors unless invited.",
+  "Ask for help in public channels. Don't DM mentors unless invited.",
   "You must be able to explain every line you submit, AI-assisted or not.",
 ];
 
@@ -19,37 +21,28 @@ export const keyRules = [
 export const phases = [
   {
     name: "Onboarding",
-    label: "29–30 Sep",
-    start: "2026-09-29",
-    end: "2026-09-30",
-    description: "Join your project, attend the walkthrough, get it running locally.",
+    label: "8–12 Oct",
+    start: "2026-10-08",
+    end: "2026-10-12",
+    description:
+      "Join your project, attend the walkthrough, meet your mentors, and get the repository running locally.",
   },
   {
     name: "Active phase",
-    label: "1–31 Oct",
-    start: "2026-10-01",
-    end: "2026-10-31",
-    description: "Pick issues, discuss approaches, open and iterate on PRs.",
+    label: "13 Oct–12 Nov",
+    start: "2026-10-13",
+    end: "2026-11-12",
+    description:
+      "Pick issues, discuss approaches, build your solutions, and open and iterate on PRs with mentor feedback.",
   },
   {
     name: "Wrap-up",
-    label: "1–10 Nov",
-    start: "2026-11-01",
-    end: "2026-11-10",
-    description: "Address final review comments; mentors integrate contributions.",
-  },
-];
-
-export const tracks = [
-  {
-    name: "Beginner",
-    description: "Smaller, easier-to-navigate repositories for those new to open source.",
-    maxIssues: 2,
-  },
-  {
-    name: "Advanced",
-    description: "Production-grade repositories for experienced coders.",
-    maxIssues: 3,
+    label: "13 Nov onwards",
+    start: "2026-11-13",
+    // Final review & evaluation ends 16 Nov (results from 17 Nov, see data/timeline.ts).
+    end: "2026-11-16",
+    description:
+      "Address final review comments, complete pending contributions, and mentors evaluate and integrate the final contributions.",
   },
 ];
 
@@ -61,7 +54,7 @@ export const contributionFlow = [
   { step: "Merged", detail: "Lands upstream and scores" },
 ];
 
-/** Base points per merged PR — provisional. `level` maps to contribution-graph shading. */
+/** Base points per merged PR. `level` maps to contribution-graph shading. */
 export const pointsByLevel = [
   { label: "Good first issue / Docs", points: 5, level: 1 },
   { label: "Beginner", points: 10, level: 2 },
@@ -104,19 +97,16 @@ export const rulebook: RuleSection[] = [
     title: "Eligibility",
     rules: [
       "Open to currently enrolled students at a participating IIT.",
-      "Register with your official institute email address — it's used to verify eligibility.",
+      "Register with your official institute email address. It's used to verify eligibility.",
       "Each student may register for at most 2 projects at a time.",
     ],
   },
   {
-    id: "timeline-and-tracks",
-    title: "Timeline and Tracks",
+    id: "timeline",
+    title: "Timeline",
     rules: [
-      { text: "Only PRs opened between 1 and 31 October 2026 count towards scoring.", provisional: true },
-      {
-        text: "PRs opened after 31 October won't be scored, but may still be reviewed during wrap-up.",
-        provisional: true,
-      },
+      "Only PRs opened between 13 October and 12 November 2026 count towards scoring.",
+      "PRs opened after 12 November won't be scored, but may still be reviewed during wrap-up.",
     ],
   },
   {
@@ -126,7 +116,7 @@ export const rulebook: RuleSection[] = [
       "Before you touch any issue, you must have the project running locally and understand how it is laid out.",
     rules: [
       "Register for the programme, join the Hello FOSS Discord server, then join your project's channel.",
-      "Attend your project's onboarding session (29–30 September), or watch the recording if one exists.",
+      "Attend your project's onboarding session (8–12 October), or watch the recording if one exists.",
       "Read the repository's README and CONTRIBUTING guidelines end to end.",
       "Fork the repository and set up the development environment by following the README exactly.",
       "Run the project and its tests locally before claiming any issue.",
@@ -142,14 +132,8 @@ export const rulebook: RuleSection[] = [
       "Use labels to match your level (good first issue, beginner, intermediate, advanced) and type (bug, feature, documentation).",
       "Read the whole issue, including comments, and check nobody is assigned and no open PR already addresses it.",
       "Comment on the issue asking to be assigned, with one or two lines on how you plan to approach it.",
-      {
-        text: "Hold at most 2 assigned issues at a time on the Beginner track, or 3 on the Advanced track.",
-        provisional: true,
-      },
-      {
-        text: "Post a progress update at least every 5 days. Issues with no activity for 5 days may be reassigned.",
-        provisional: true,
-      },
+      "Hold at most 2 assigned issues at a time.",
+      "Post a progress update at least every 5 days. Issues with no activity for 5 days may be reassigned.",
       "Can't continue? Say so on the issue and unassign yourself.",
       "For architectural or advanced issues, post your proposed approach and wait for mentor feedback before implementing.",
       "Want to report a bug or propose a feature? Search for duplicates, give clear repro steps or motivation, and wait for a mentor to label and approve it first.",
@@ -184,11 +168,8 @@ export const rulebook: RuleSection[] = [
       "Mentors review your PR as maintainers: does it solve the issue, fit the project's conventions, handle edge cases, and include tests and docs where needed?",
     rules: [
       "Respond to every review comment, either with a change or a reasoned reply.",
-      "Push fixes to the same branch — don't open a new PR for the same issue.",
-      {
-        text: "Reply within 3 days of a review. PRs inactive for 7 days after a review may be closed and reassigned.",
-        provisional: true,
-      },
+      "Push fixes to the same branch. Don't open a new PR for the same issue.",
+      "Reply within 3 days of a review. PRs inactive for 5 days after a review may be closed and reassigned.",
       "Disagree politely and with reasons. The mentor's decision on project direction is final.",
       "Re-request review once all comments are resolved.",
       "Mentors aren't expected to reply instantly. Wait a reasonable time, then ping once.",
@@ -200,15 +181,11 @@ export const rulebook: RuleSection[] = [
     intro:
       "Each merged PR earns a score based on its priority, code volume, and complexity. The highest totals at the end of the programme are eligible for prizes.",
     rules: [
-      {
-        text: "Mentors may add up to +50% for high-priority issues or unusually complex work.",
-        provisional: true,
-      },
+      "Mentors may add up to +50% for high-priority issues or unusually complex work.",
       "Only merged PRs score. Open or closed-unmerged PRs score zero.",
       "The PR must be linked to an issue that was assigned to you.",
       "Volume means meaningful change, not line count. Splitting one fix into many PRs, padding code, or trivial edits won't be scored.",
       "Mentors' scoring decisions are final; organisers handle disputes.",
-      { text: "Leaderboards are tracked separately for the Beginner and Advanced tracks.", provisional: true },
     ],
   },
   {
@@ -222,7 +199,7 @@ export const rulebook: RuleSection[] = [
       "When you ask, say what you're trying to do, what you tried, what happened, and what you expected.",
       "Paste errors as text in code blocks, not screenshots.",
       "Ping a mentor at most once per question, and only after a reasonable wait.",
-      "Blocked by something outside your project (repo down, missing access, conduct issues)? Tell your mentor — they'll escalate.",
+      "Blocked by something outside your project (repo down, missing access, conduct issues)? Tell your mentor and they'll escalate.",
     ],
     callout: "Don't DM mentors for technical help unless they invite you to. Public answers help the next person.",
   },
@@ -242,7 +219,6 @@ export const rulebook: RuleSection[] = [
   {
     id: "ai-tools",
     title: "AI Tools",
-    provisional: true,
     rules: [
       "AI assistants may be used for learning and drafting, but you are responsible for every line you submit.",
       "You must understand, test, and be able to explain your changes when a mentor asks.",
@@ -253,14 +229,13 @@ export const rulebook: RuleSection[] = [
   {
     id: "violations",
     title: "Violations and Consequences",
-    provisional: true,
     intro: "Mentors report violations to the organising team, which makes the final decision.",
     rules: [],
   },
   {
     id: "checklist",
-    title: "Before Every PR",
-    intro: "Tick these off as you go — your progress is saved in this browser.",
+    title: "Ready to Contribute?",
+    intro: "Tick these off as you go. Your progress is saved here.",
     rules: [],
   },
 ];

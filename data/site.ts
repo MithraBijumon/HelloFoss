@@ -11,6 +11,7 @@ export const siteConfig = {
     { label: "Mentors", href: "/mentors" },
     { label: "Timeline", href: "/timeline" },
     { label: "Rulebook", href: "/rulebook" },
+    { label: "Beyond", href: "/programs" },
     { label: "FAQ", href: "/faq" },
   ],
   footerLinks: [
@@ -18,6 +19,7 @@ export const siteConfig = {
     { label: "Mentors", href: "/mentors" },
     { label: "Timeline", href: "/timeline" },
     { label: "Rulebook", href: "/rulebook" },
+    { label: "Beyond", href: "/programs" },
     { label: "FAQ", href: "/faq" },
     { label: "Register", href: "#" },
   ],

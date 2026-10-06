@@ -2,7 +2,7 @@ import type { Project } from "@/lib/types";
 
 /**
  * No projects have been announced yet. Add entries here once repositories,
- * mentors, and issues are finalized — the UI already supports this data
+ * mentors, and issues are finalized. The UI already supports this data
  * shape end to end (preview cards, filters, and /projects/[slug] pages).
  */
 const realProjects: Project[] = [];
@@ -20,7 +20,7 @@ const devSampleProjects: Project[] = [
     description: "A terminal-first issue tracker for small open-source teams, built as a single static binary.",
     longDescription:
       "DevTrack CLI lets maintainers triage issues, assign labels, and track PR status without leaving the terminal. Contributors will work on the sync engine, the TUI, and a plugin system for custom commands.",
-    track: "Advanced",
+    track: "Beginner",
     iitId: "iit-bombay",
     technologies: ["Go", "Cobra", "SQLite"],
     mentorIds: ["mentor-arjun-mehta"],
@@ -52,7 +52,7 @@ const devSampleProjects: Project[] = [
     description: "An experimentation toolkit for benchmarking lightweight computer-vision models on edge devices.",
     longDescription:
       "VisionLab wraps common CV benchmarks behind a consistent CLI and dashboard, so researchers can compare model size, latency, and accuracy trade-offs. Contributors will add new model adapters and benchmark datasets.",
-    track: "Advanced",
+    track: "Beginner",
     iitId: "iit-madras",
     technologies: ["Python", "PyTorch", "OpenCV"],
     mentorIds: ["mentor-karthik-s"],

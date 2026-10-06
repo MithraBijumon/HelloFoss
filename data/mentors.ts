@@ -2,7 +2,7 @@ import type { Mentor } from "@/lib/types";
 
 /**
  * No mentors have been confirmed yet. Add entries here once project
- * maintainers are onboarded — the mentor directory and project pages
+ * maintainers are onboarded; the mentor directory and project pages
  * already support this data shape.
  */
 const realMentors: Mentor[] = [];

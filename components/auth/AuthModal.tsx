@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
-import { X } from "lucide-react";
+import { useEffect, useState, type FormEvent, type InputHTMLAttributes } from "react";
+import { Eye, EyeOff, X } from "lucide-react";
 import { iits } from "@/data/iits";
 import { useAuth, type AuthModalMode } from "@/lib/auth-context";
 import { buttonBaseClasses, buttonVariantClasses, buttonSizeClasses } from "@/components/ui/Button";
@@ -14,6 +14,25 @@ const MIN_PASSWORD_LENGTH = 8;
 
 const inputClasses =
   "h-10 rounded-md border border-border-strong bg-background px-3 text-sm outline-none focus-visible:outline-2 focus-visible:outline-ring";
+
+function PasswordInput(props: Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "className">) {
+  const [visible, setVisible] = useState(false);
+  const Icon = visible ? EyeOff : Eye;
+  return (
+    <div className="relative">
+      <input {...props} type={visible ? "text" : "password"} className={cn(inputClasses, "w-full pr-10")} />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-muted-subtle transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+      >
+        <Icon className="h-4 w-4" aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
 
 type Step =
   | { kind: "signin" }
@@ -253,12 +272,10 @@ function AuthModalDialog({
             </label>
             <label className="flex flex-col gap-1.5 text-sm">
               Password
-              <input
+              <PasswordInput
                 required
-                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={inputClasses}
                 autoComplete="current-password"
               />
             </label>
@@ -309,7 +326,7 @@ function AuthModalDialog({
                 autoComplete="email"
               />
               <span className="text-xs text-muted-subtle">
-                Use your institute email ({instituteDomains}) — we&apos;ll detect your IIT from it.
+                Use your institute email ({instituteDomains}). We&apos;ll detect your IIT from it.
               </span>
             </label>
 
@@ -354,7 +371,7 @@ function AuthModalDialog({
 
             {devCode && (
               <p className="rounded-md border border-dashed border-border-strong bg-background px-3 py-2 font-mono text-sm">
-                Dev mode — no email configured. Your code is{" "}
+                Dev mode: no email configured. Your code is{" "}
                 <span className="font-semibold">{devCode}</span>
               </p>
             )}
@@ -376,24 +393,20 @@ function AuthModalDialog({
 
             <label className="flex flex-col gap-1.5 text-sm">
               Choose a password
-              <input
+              <PasswordInput
                 required
-                type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className={inputClasses}
                 autoComplete="new-password"
                 minLength={MIN_PASSWORD_LENGTH}
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm">
               Confirm password
-              <input
+              <PasswordInput
                 required
-                type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inputClasses}
                 autoComplete="new-password"
                 minLength={MIN_PASSWORD_LENGTH}
               />
@@ -471,7 +484,7 @@ function AuthModalDialog({
 
             {devCode && (
               <p className="rounded-md border border-dashed border-border-strong bg-background px-3 py-2 font-mono text-sm">
-                Dev mode — no email configured. Your code is{" "}
+                Dev mode: no email configured. Your code is{" "}
                 <span className="font-semibold">{devCode}</span>
               </p>
             )}
@@ -493,24 +506,20 @@ function AuthModalDialog({
 
             <label className="flex flex-col gap-1.5 text-sm">
               New password
-              <input
+              <PasswordInput
                 required
-                type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className={inputClasses}
                 autoComplete="new-password"
                 minLength={MIN_PASSWORD_LENGTH}
               />
             </label>
             <label className="flex flex-col gap-1.5 text-sm">
               Confirm new password
-              <input
+              <PasswordInput
                 required
-                type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inputClasses}
                 autoComplete="new-password"
                 minLength={MIN_PASSWORD_LENGTH}
               />

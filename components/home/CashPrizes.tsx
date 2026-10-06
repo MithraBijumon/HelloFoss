@@ -12,7 +12,7 @@ export function CashPrizes() {
           <SectionHeading
             eyebrow="Cash Prizes"
             title="Top contributors get rewarded"
-            description="Beyond the experience and mentorship, the best contributions across both tracks are recognized with cash prizes."
+            description="Beyond the experience and mentorship, the best contributions are recognized with cash prizes."
           />
           <Link
             href="/rulebook"

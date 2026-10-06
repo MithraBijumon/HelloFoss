@@ -7,7 +7,6 @@ import { Checklist } from "@/components/rulebook/Checklist";
 import {
   rulebook,
   keyRules,
-  tracks,
   contributionFlow,
   pointsByLevel,
   violations,
@@ -28,6 +27,11 @@ const levelFill = [
   "color-mix(in srgb, var(--accent) 78%, transparent)",
   "var(--accent)",
 ];
+
+const hasProvisional = rulebook.some(
+  (section) =>
+    section.provisional || section.rules.some((rule) => typeof rule !== "string" && rule.provisional)
+);
 
 function TbcTag() {
   return (
@@ -121,23 +125,6 @@ function ContributionFlow() {
   );
 }
 
-function Tracks() {
-  return (
-    <div className="mt-6 grid gap-4 sm:grid-cols-2">
-      {tracks.map((track) => (
-        <div key={track.name} className="rounded-lg border border-border bg-card p-5">
-          <p className="font-semibold">{track.name} track</p>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted">{track.description}</p>
-          <p className="mt-4 font-mono text-xs text-muted-subtle">
-            max {track.maxIssues} assigned issues at a time
-            <TbcTag />
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function PointsGrid() {
   return (
     <div className="mt-6">
@@ -156,7 +143,6 @@ function PointsGrid() {
       </div>
       <p className="mt-3 font-mono text-xs text-muted-subtle">
         base points per merged PR
-        <TbcTag />
       </p>
     </div>
   );
@@ -195,11 +181,10 @@ function ViolationsTable() {
 
 function SectionBody({ section }: { section: RuleSection }) {
   switch (section.id) {
-    case "timeline-and-tracks":
+    case "timeline":
       return (
         <>
           <TimelineBar />
-          <Tracks />
           <RuleList rules={section.rules} />
         </>
       );
@@ -266,7 +251,7 @@ export default function RulebookPage() {
                 <span className="h-2.5 w-2.5 rounded-full bg-border-strong" />
                 <span className="h-2.5 w-2.5 rounded-full bg-border-strong" />
                 <span className="ml-3 font-mono text-xs text-muted-subtle">
-                  tl;dr — if you read nothing else
+                  tl;dr: if you read nothing else
                 </span>
               </div>
               <ol className="flex flex-col gap-3 px-5 py-5 sm:px-6">
@@ -294,9 +279,11 @@ export default function RulebookPage() {
               </section>
             ))}
 
-            <p className="mt-16 border-t border-border pt-6 font-mono text-xs leading-relaxed text-muted-subtle">
-              Items tagged <TbcTag /> are proposed defaults the organisers are still confirming.
-            </p>
+            {hasProvisional && (
+              <p className="mt-16 border-t border-border pt-6 font-mono text-xs leading-relaxed text-muted-subtle">
+                Items tagged <TbcTag /> are proposed defaults the organisers are still confirming.
+              </p>
+            )}
           </div>
         </div>
       </Container>

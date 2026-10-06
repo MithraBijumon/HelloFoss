@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const name = typeof body?.name === "string" ? body.name.trim() : "";
 
-  if (!canSendOtp()) {
+  if (!(await canSendOtp())) {
     return NextResponse.json(
       { error: "Registration is temporarily unavailable. Please try again later." },
       { status: 503 }
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
   let resolvedIitId: string | null = null;
   let mentorId: string | null = null;
 
-  // The institute is derived from the email domain — there's no user-chosen IIT.
+  // The institute is derived from the email domain; there's no user-chosen IIT.
   const matchedIit = findIITByEmail(email);
 
   if (isAdmin) {

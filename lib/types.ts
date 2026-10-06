@@ -46,7 +46,12 @@ export interface TimelineEvent {
   id: string;
   title: string;
   description: string;
+  /** Display label, e.g. "8–12 Oct". */
   date?: string;
+  /** ISO dates (YYYY-MM-DD, inclusive). When set, status is derived from today's date. */
+  start?: string;
+  end?: string;
+  /** Used when no dates are set. */
   status: TimelineStatus;
 }
 

@@ -74,7 +74,7 @@ export async function consumeOtp(userId: string, code: string): Promise<boolean>
 }
 
 /**
- * Used to complete registration and to reset a forgotten password — both
+ * Used to complete registration and to reset a forgotten password; both
  * are "prove you own this email, then set a password" flows.
  */
 export async function verifyOtpAndSetPassword(

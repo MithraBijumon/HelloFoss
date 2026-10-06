@@ -2,13 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { FolderGit2 } from "lucide-react";
-import type { Project, Track } from "@/lib/types";
+import type { Project } from "@/lib/types";
 import { iits } from "@/data/iits";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
-
-const tracks: ("All" | Track)[] = ["All", "Beginner", "Advanced"];
 
 function FilterGroup({
   label,
@@ -55,28 +53,20 @@ export function ProjectsExplorer({
   projects: Project[];
   technologies: string[];
 }) {
-  const [track, setTrack] = useState<string>("All");
   const [iit, setIit] = useState<string>("All");
   const [tech, setTech] = useState<string>("All");
 
   const filtered = useMemo(() => {
     return projects.filter((p) => {
-      if (track !== "All" && p.track !== track) return false;
       if (iit !== "All" && p.iitId !== iit) return false;
       if (tech !== "All" && !p.technologies.includes(tech)) return false;
       return true;
     });
-  }, [projects, track, iit, tech]);
+  }, [projects, iit, tech]);
 
   return (
     <div>
       <div className="flex flex-col gap-8 border-b border-border pb-10 sm:flex-row sm:gap-12">
-        <FilterGroup
-          label="Track"
-          value={track}
-          onChange={setTrack}
-          options={tracks.map((t) => ({ value: t, label: t }))}
-        />
         <FilterGroup
           label="IIT"
           value={iit}
@@ -117,7 +107,7 @@ export function ProjectsExplorer({
           className="mt-10"
           icon={FolderGit2}
           title="No projects match these filters"
-          description="Try a different combination of track, IIT, or technology."
+          description="Try a different combination of IIT or technology."
         />
       )}
     </div>

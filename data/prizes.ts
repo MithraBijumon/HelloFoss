@@ -6,16 +6,10 @@ import type { CashPrize } from "@/lib/types";
  */
 export const cashPrizes: CashPrize[] = [
   {
-    id: "best-advanced-contributor",
-    title: "Best Advanced Track Contributor",
+    id: "best-contributor",
+    title: "Best Contributor",
     description:
-      "Awarded to the contributor with the most impactful merged work in the Advanced track.",
-  },
-  {
-    id: "best-beginner-contributor",
-    title: "Best Beginner Track Contributor",
-    description:
-      "Awarded to the contributor with the most impactful merged work in the Beginner track.",
+      "Awarded to the contributor with the most impactful merged work across all projects.",
   },
   {
     id: "best-first-pr",

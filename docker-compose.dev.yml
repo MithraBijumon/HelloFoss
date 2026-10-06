@@ -1,4 +1,4 @@
-# Local development only — a throwaway Postgres for running the app and
+# Local development only: a throwaway Postgres for running the app and
 # `prisma migrate dev` against on your machine. Not used in production;
 # production runs against the Postgres resource provisioned on your own
 # server (see DEPLOYMENT.md).

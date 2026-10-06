@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
-  if (!canSendOtp()) {
+  if (!(await canSendOtp())) {
     return NextResponse.json(
       { error: "Password reset is temporarily unavailable. Contact the organisers for help." },
       { status: 503 }

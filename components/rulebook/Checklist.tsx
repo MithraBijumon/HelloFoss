@@ -20,7 +20,7 @@ function writeChecked(indices: number[]) {
   try {
     localStorage.setItem(STORAGE_KEY, indices.join(","));
   } catch {
-    // Storage unavailable (private mode etc.) — the checklist just won't persist.
+    // Storage unavailable (private mode etc.); the checklist just won't persist.
   }
   listeners.forEach((l) => l());
 }

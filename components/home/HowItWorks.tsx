@@ -2,7 +2,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 const steps = [
-  { number: "01", title: "Register", description: "Sign up and choose your track." },
+  { number: "01", title: "Register", description: "Sign up with your institute email." },
   {
     number: "02",
     title: "Explore Projects",
@@ -11,7 +11,7 @@ const steps = [
   {
     number: "03",
     title: "Pick an Issue",
-    description: "Choose an issue that fits your track.",
+    description: "Choose an issue that fits your skills.",
   },
   { number: "04", title: "Build", description: "Work through the problem locally." },
   {

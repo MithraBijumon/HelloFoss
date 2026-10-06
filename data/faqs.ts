@@ -11,37 +11,31 @@ export const faqs: FAQ[] = [
     id: "who-can-participate",
     question: "Who can participate?",
     answer:
-      "Students from participating IITs can register and take part. Both the Beginner and Advanced tracks are designed to accommodate different levels of prior experience.",
+      "Currently enrolled students at participating IITs can register using their institute email address.",
   },
   {
     id: "prior-experience",
     question: "Do I need prior open-source experience?",
     answer:
-      "No. The Beginner track is designed for students who are new to open source and version control. The Advanced track is suited for students who already have some experience contributing to real projects.",
-  },
-  {
-    id: "tracks",
-    question: "What are the Beginner and Advanced tracks?",
-    answer:
-      "The Beginner track focuses on guided, well-scoped issues to help you learn open-source workflows end to end. The Advanced track involves deeper, more complex contributions to project codebases for students who are already comfortable with Git and GitHub.",
+      "No. Hello FOSS is designed for students who are new to open source and version control. Mentors guide you through your first issues and pull requests.",
   },
   {
     id: "how-many-projects",
     question: "How many projects can I register for?",
     answer:
-      "Each participant may register for up to 2 projects. Choose the ones that best match your track and interests when you register.",
+      "Each participant may register for up to 2 projects. Choose the ones that best match your interests when you register.",
   },
   {
     id: "how-projects-work",
     question: "How do projects work?",
     answer:
-      "Each project is prepared and maintained by mentors, who curate real repositories, create beginner- and advanced-friendly issues, and guide contributors throughout the program. Projects are listed on the Projects page along with their track, tech stack, and mentor information.",
+      "Each project is prepared and maintained by mentors, who curate real repositories, create well-scoped issues across difficulty levels, and guide contributors throughout the program. Projects are listed on the Projects page along with their tech stack and mentor information.",
   },
   {
     id: "issue-selection",
     question: "How do I select an issue?",
     answer:
-      "Once you've explored the available projects, you can browse open issues on each project's repository and pick one that matches your track and interests. Mentors are available to help guide this selection.",
+      "Once you've explored the available projects, you can browse open issues on each project's repository and pick one that matches your skills and interests. Mentors are available to help guide this selection.",
   },
   {
     id: "pull-requests",

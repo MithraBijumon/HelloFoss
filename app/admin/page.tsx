@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { Download } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { UsersTable } from "@/components/admin/UsersTable";
-import { getAdminSession, getAdminUsers } from "@/lib/admin";
+import { MailSendersPanel } from "@/components/admin/MailSendersPanel";
+import { getAdminSession, getAdminUsers, getAdminMailSenders } from "@/lib/admin";
 import { projects } from "@/data/projects";
 import { iits } from "@/data/iits";
 import { buttonBaseClasses, buttonVariantClasses, buttonSizeClasses } from "@/components/ui/Button";
@@ -28,7 +29,8 @@ export default async function AdminPage() {
   // Non-admins get a plain 404 so the page's existence isn't advertised.
   if (!(await getAdminSession())) notFound();
 
-  const users = await getAdminUsers();
+  const [users, mailSenders] = await Promise.all([getAdminUsers(), getAdminMailSenders()]);
+  const envMailConfigured = Boolean(process.env.GAS_MAIL_WEBHOOK_URL && process.env.GAS_MAIL_SECRET);
   const students = users.filter((u) => u.role === "STUDENT");
   const verified = students.filter((u) => u.verified);
   const withProject = students.filter((u) => u.projects.length > 0);
@@ -91,7 +93,7 @@ export default async function AdminPage() {
           <h2 className="text-lg font-semibold">By project</h2>
           {projectRows.length === 0 ? (
             <p className="mt-4 rounded-lg border border-dashed border-border-strong px-4 py-8 text-center text-sm text-muted">
-              No projects published yet — add them in <code className="font-mono">data/projects.ts</code>.
+              No projects published yet. Add them in <code className="font-mono">data/projects.ts</code>.
             </p>
           ) : (
             <div className="mt-4 overflow-x-auto rounded-lg border border-border">
@@ -146,6 +148,11 @@ export default async function AdminPage() {
           </div>
         </section>
       </div>
+
+      <section className="mt-12">
+        <h2 className="text-lg font-semibold">Mail senders</h2>
+        <MailSendersPanel initialSenders={mailSenders} envConfigured={envMailConfigured} />
+      </section>
 
       <section className="mt-12">
         <h2 className="text-lg font-semibold">All users</h2>

@@ -86,7 +86,7 @@ export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: strin
               <tr key={u.id} className="border-b border-border align-top last:border-b-0">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{u.name || "—"}</span>
+                    <span className="font-medium">{u.name || "-"}</span>
                     {u.role !== "STUDENT" && (
                       <Badge variant="accent" className="px-1.5 py-0.5 text-[10px]">
                         {u.role}
@@ -97,9 +97,9 @@ export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: strin
                     {u.email}
                   </a>
                 </td>
-                <td className="px-4 py-3 text-muted">{u.iit ?? "—"}</td>
+                <td className="px-4 py-3 text-muted">{u.iit ?? "-"}</td>
                 <td className="px-4 py-3 text-muted">
-                  {u.projects.length ? u.projects.map((p) => <div key={p.slug}>{p.name}</div>) : "—"}
+                  {u.projects.length ? u.projects.map((p) => <div key={p.slug}>{p.name}</div>) : "-"}
                 </td>
                 <td className="px-4 py-3">
                   <span className={u.verified ? "text-accent" : "text-muted-subtle"}>

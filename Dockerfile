@@ -17,7 +17,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 # `next build` evaluates API route modules to collect their config, which
-# eagerly constructs the Prisma client (lib/db.ts) — it never connects at
+# eagerly constructs the Prisma client (lib/db.ts). It never connects at
 # build time, but it does require DATABASE_URL to be a non-empty string.
 # The real value is injected by Coolify at runtime, not at build time.
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"

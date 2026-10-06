@@ -2,11 +2,11 @@ import type { IIT } from "@/lib/types";
 
 /**
  * `logo`: path under /public, e.g. "/logos/iit-bombay.svg". Drop the file in
- * public/logos/ and set the path here — the UI falls back to a text badge
+ * public/logos/ and set the path here; the UI falls back to a text badge
  * when unset.
  *
  * `emailDomains`: used to verify a student actually belongs to this institute
- * at signup. These are best-known public domains — correct them here if
+ * at signup. These are best-known public domains. Correct them here if
  * wrong, nothing else needs to change.
  */
 export const iits: IIT[] = [
@@ -31,7 +31,7 @@ export const iits: IIT[] = [
     name: "Indian Institute of Technology Madras",
     shortName: "IIT Madras",
     city: "Chennai",
-    // No club logo provided yet — falls back to the Landmark icon below.
+    logo: "/logos/madras-logo.png",
     emailDomains: ["smail.iitm.ac.in"],
   },
   {

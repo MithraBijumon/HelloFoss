@@ -1,63 +1,56 @@
 import type { TimelineEvent } from "@/lib/types";
 
 /**
- * Dates are intentionally left unset ("TBA") until officially announced.
- * Update `date` and `status` per stage as the program progresses.
+ * Hello FOSS 2026 schedule. Stages with `start`/`end` mark themselves as
+ * active or completed based on the viewer's date; `status` is the fallback.
  */
 export const timeline: TimelineEvent[] = [
   {
-    id: "registration",
-    title: "Registration",
+    id: "onboarding",
+    title: "Onboarding",
+    date: "8–12 Oct",
+    start: "2026-10-08",
+    end: "2026-10-12",
     description:
-      "Students across participating IITs sign up for Hello FOSS and choose their track.",
+      "Join your project, meet your mentors, attend the project walkthrough, and get the repository running locally.",
     status: "upcoming",
   },
   {
-    id: "orientation",
-    title: "Orientation",
+    id: "contribution-phase",
+    title: "Contribution Phase",
+    date: "13 Oct–12 Nov",
+    start: "2026-10-13",
+    end: "2026-11-12",
     description:
-      "An introduction to open source workflows, Git, GitHub, and how the program runs.",
-    status: "upcoming",
-  },
-  {
-    id: "project-exploration",
-    title: "Project Exploration",
-    description:
-      "Participants explore participating repositories and get familiar with each codebase.",
-    status: "upcoming",
-  },
-  {
-    id: "issue-selection",
-    title: "Issue Selection",
-    description:
-      "Contributors pick issues that match their track and interests, guided by mentors.",
-    status: "upcoming",
-  },
-  {
-    id: "contribution-period",
-    title: "Contribution Period",
-    description:
-      "The core window for building, testing, and submitting pull requests against real issues.",
+      "Explore issues, discuss approaches with mentors, build your solutions, and open and iterate on pull requests.",
     status: "upcoming",
   },
   {
     id: "pr-review",
     title: "PR Review",
+    date: "Throughout the Contribution Phase",
+    start: "2026-10-13",
+    end: "2026-11-12",
     description:
-      "Mentors and maintainers review submitted pull requests and provide feedback.",
+      "Mentors and maintainers review contributions, provide feedback, and guide contributors through revisions and improvements.",
     status: "upcoming",
   },
   {
-    id: "final-evaluation",
-    title: "Final Evaluation",
+    id: "final-review",
+    title: "Final Review & Evaluation",
+    date: "13–16 Nov",
+    start: "2026-11-13",
+    end: "2026-11-16",
     description:
-      "Contributions are evaluated based on quality, impact, and engagement with the review process.",
+      "Address final review comments, complete pending contributions, and have mentors evaluate the work based on quality, impact, and engagement.",
     status: "upcoming",
   },
   {
     id: "results",
     title: "Results",
-    description: "Final results and recognitions are announced to all participants.",
+    date: "17 Nov onwards",
+    start: "2026-11-17",
+    description: "Final results and recognitions are announced across the participating IITs.",
     status: "upcoming",
   },
 ];

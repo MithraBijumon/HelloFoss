@@ -52,6 +52,23 @@ model Session {
   @@index([userId])
 }
 
+/// A Google Apps Script mailer (scripts/gas-mailer.gs) deployed under one
+/// Google account. OTP emails go through enabled senders in `priority`
+/// order, falling through to the next when one fails (e.g. daily quota hit).
+model MailSender {
+  id          String    @id @default(cuid())
+  label       String
+  webhookUrl  String
+  secret      String
+  enabled     Boolean   @default(true)
+  priority    Int       @default(0)
+  lastUsedAt  DateTime?
+  lastError   String?
+  lastErrorAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
 model Registration {
   id          String   @id @default(cuid())
   userId      String
