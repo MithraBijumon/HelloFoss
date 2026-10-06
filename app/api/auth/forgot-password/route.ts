@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createOtp, hasActiveOtpCooldown } from "@/lib/auth";
-import { isMailConfigured, sendOtpEmail } from "@/lib/email";
+import { canSendOtp, sendOtpEmail } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -9,9 +9,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
 
-  // Without a mailer the code is returned to whoever asked for it, which would
-  // let anyone reset anyone's password — so resets are off until mail is set up.
-  if (process.env.NODE_ENV === "production" && !isMailConfigured()) {
+  if (!canSendOtp()) {
     return NextResponse.json(
       { error: "Password reset is temporarily unavailable. Contact the organisers for help." },
       { status: 503 }
@@ -35,7 +33,16 @@ export async function POST(request: Request) {
   }
 
   const { code } = await createOtp(user.id);
-  const devCode = await sendOtpEmail(email, code);
+  let devCode: string | undefined;
+  try {
+    devCode = await sendOtpEmail(email, code);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "We couldn't send the email. Please try again in a minute." },
+      { status: 502 }
+    );
+  }
 
   return NextResponse.json({ ok: true, devCode });
 }

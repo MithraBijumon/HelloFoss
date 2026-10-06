@@ -26,7 +26,7 @@ export type AuthModalMode = "signin" | "register";
 
 type ModalState =
   | { open: false }
-  | { open: true; mode: AuthModalMode; iitId?: string; onSuccess?: () => void };
+  | { open: true; mode: AuthModalMode; onSuccess?: () => void };
 
 type ActionResult = { ok: boolean; error?: string };
 
@@ -36,7 +36,7 @@ type AuthContextValue = {
   registrations: string[];
   registrationsLoading: boolean;
   modal: ModalState;
-  openAuthModal: (opts?: { mode?: AuthModalMode; iitId?: string; onSuccess?: () => void }) => void;
+  openAuthModal: (opts?: { mode?: AuthModalMode; onSuccess?: () => void }) => void;
   closeAuthModal: () => void;
   refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
@@ -98,11 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openAuthModal = useCallback(
-    (opts?: { mode?: AuthModalMode; iitId?: string; onSuccess?: () => void }) => {
+    (opts?: { mode?: AuthModalMode; onSuccess?: () => void }) => {
       setModal({
         open: true,
         mode: opts?.mode ?? "signin",
-        iitId: opts?.iitId,
         onSuccess: opts?.onSuccess,
       });
     },

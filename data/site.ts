@@ -7,7 +7,6 @@ export const siteConfig = {
   registerUrl: "#",
   nav: [
     { label: "Home", href: "/" },
-    { label: "About", href: "/about" },
     { label: "Projects", href: "/projects" },
     { label: "Mentors", href: "/mentors" },
     { label: "Timeline", href: "/timeline" },
@@ -15,7 +14,6 @@ export const siteConfig = {
     { label: "FAQ", href: "/faq" },
   ],
   footerLinks: [
-    { label: "About", href: "/about" },
     { label: "Projects", href: "/projects" },
     { label: "Mentors", href: "/mentors" },
     { label: "Timeline", href: "/timeline" },

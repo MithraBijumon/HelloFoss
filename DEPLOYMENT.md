@@ -47,11 +47,11 @@ full list with descriptions):
 | `GAS_MAIL_SECRET` | **Required in production** — see warning below |
 
 **`GAS_MAIL_WEBHOOK_URL`/`GAS_MAIL_SECRET` are not optional in production.**
-When they're unset, [lib/email.ts](lib/email.ts) skips sending mail entirely
-and instead returns the OTP code directly in the API response (that's the
-dev convenience the login modal shows as "Dev mode — your code is...").
-Deploying without them means anyone watching network traffic could read
-anyone else's login code. Follow the setup steps at the top of
+Without them, registration and password reset are switched off in
+production (the API answers "temporarily unavailable"), because the only
+alternative is handing the OTP code to whoever asked for it. In `next dev`,
+the code is shown in the login modal instead ("Dev mode — your code is...").
+Follow the setup steps at the top of
 `scripts/gas-mailer.gs` to deploy the mailer and get both values before going
 live. Note its quota is tied to whichever Google account you deploy it
 under — 100 emails/day on a personal gmail.com account, 1,500/day on a

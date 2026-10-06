@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createOtp, hasActiveOtpCooldown } from "@/lib/auth";
-import { sendOtpEmail } from "@/lib/email";
-import { getIITById, findIITByEmail } from "@/data/iits";
+import { canSendOtp, sendOtpEmail } from "@/lib/email";
+import { iits, findIITByEmail } from "@/data/iits";
 import { mentors } from "@/data/mentors";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,7 +18,13 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
   const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const iitId = typeof body?.iitId === "string" ? body.iitId : "";
+
+  if (!canSendOtp()) {
+    return NextResponse.json(
+      { error: "Registration is temporarily unavailable. Please try again later." },
+      { status: 503 }
+    );
+  }
 
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
@@ -42,26 +48,21 @@ export async function POST(request: Request) {
   let resolvedIitId: string | null = null;
   let mentorId: string | null = null;
 
+  // The institute is derived from the email domain — there's no user-chosen IIT.
+  const matchedIit = findIITByEmail(email);
+
   if (isAdmin) {
     role = "ADMIN";
-    resolvedIitId = getIITById(iitId) ? iitId : null;
+    resolvedIitId = matchedIit?.id ?? null;
   } else if (mentor) {
     role = "MENTOR";
     mentorId = mentor.id;
     resolvedIitId = mentor.iitId;
   } else {
-    if (!getIITById(iitId)) {
-      return NextResponse.json({ error: "Choose your institute." }, { status: 400 });
-    }
-    const matchedIit = findIITByEmail(email);
-    if (!matchedIit || matchedIit.id !== iitId) {
-      const chosen = getIITById(iitId);
+    if (!matchedIit) {
+      const domains = iits.flatMap((iit) => iit.emailDomains).join(", ");
       return NextResponse.json(
-        {
-          error: chosen
-            ? `This email doesn't match a ${chosen.shortName} address.`
-            : "This email doesn't match any participating institute.",
-        },
+        { error: `Use your institute email address (${domains}).` },
         { status: 400 }
       );
     }
@@ -83,7 +84,16 @@ export async function POST(request: Request) {
   }
 
   const { code } = await createOtp(user.id);
-  const devCode = await sendOtpEmail(email, code);
+  let devCode: string | undefined;
+  try {
+    devCode = await sendOtpEmail(email, code);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { error: "We couldn't send the verification email. Please try again in a minute." },
+      { status: 502 }
+    );
+  }
 
   return NextResponse.json({ ok: true, devCode });
 }

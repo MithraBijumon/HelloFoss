@@ -7,6 +7,8 @@ import { useAuth, type AuthModalMode } from "@/lib/auth-context";
 import { buttonBaseClasses, buttonVariantClasses, buttonSizeClasses } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
+const instituteDomains = iits.flatMap((iit) => iit.emailDomains).join(", ");
+
 const RESEND_COOLDOWN_S = 30;
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -23,16 +25,14 @@ type Step =
 export function AuthModal() {
   const { modal } = useAuth();
   if (!modal.open) return null;
-  return <AuthModalDialog initialMode={modal.mode} initialIitId={modal.iitId} onSuccess={modal.onSuccess} />;
+  return <AuthModalDialog initialMode={modal.mode} onSuccess={modal.onSuccess} />;
 }
 
 function AuthModalDialog({
   initialMode,
-  initialIitId,
   onSuccess,
 }: {
   initialMode: AuthModalMode;
-  initialIitId?: string;
   onSuccess?: () => void;
 }) {
   const { closeAuthModal, refreshUser } = useAuth();
@@ -42,7 +42,6 @@ function AuthModalDialog({
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [iitId, setIitId] = useState(initialIitId ?? "");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -110,7 +109,7 @@ function AuthModalDialog({
     resetMessages();
     setSubmitting(true);
     try {
-      const { ok, data } = await postJson("/api/auth/request-otp", { email, name, iitId });
+      const { ok, data } = await postJson("/api/auth/request-otp", { email, name });
       if (!ok) {
         setError(data.error ?? "Something went wrong.");
         return;
@@ -309,24 +308,9 @@ function AuthModalDialog({
                 placeholder="you@iitb.ac.in"
                 autoComplete="email"
               />
-            </label>
-            <label className="flex flex-col gap-1.5 text-sm">
-              Institute
-              <select
-                required
-                value={iitId}
-                onChange={(e) => setIitId(e.target.value)}
-                className={inputClasses}
-              >
-                <option value="" disabled>
-                  Choose your IIT
-                </option>
-                {iits.map((iit) => (
-                  <option key={iit.id} value={iit.id}>
-                    {iit.shortName}
-                  </option>
-                ))}
-              </select>
+              <span className="text-xs text-muted-subtle">
+                Use your institute email ({instituteDomains}) — we&apos;ll detect your IIT from it.
+              </span>
             </label>
 
             {error && (

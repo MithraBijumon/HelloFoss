@@ -44,6 +44,7 @@ function doPost(e) {
       subject: body.subject,
       body: body.text,
       htmlBody: body.html || undefined,
+      name: "Hello FOSS",
     });
 
     return jsonResponse({ ok: true });
