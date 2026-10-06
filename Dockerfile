@@ -2,6 +2,9 @@
 # final image (notably the `prisma` CLI) so the container can run
 # `prisma migrate deploy` on startup without a separate deploy step.
 FROM node:24-bookworm-slim AS base
+# Prisma's CLI detects libssl at runtime; the slim image doesn't ship it.
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 FROM base AS deps

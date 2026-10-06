@@ -1,3 +1,7 @@
+export function isMailConfigured(): boolean {
+  return Boolean(process.env.GAS_MAIL_WEBHOOK_URL && process.env.GAS_MAIL_SECRET);
+}
+
 /**
  * Sends mail through a Google Apps Script web app (see scripts/gas-mailer.gs)
  * running MailApp under a Google account, instead of a paid transactional

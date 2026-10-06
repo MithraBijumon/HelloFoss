@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, LogOut } from "lucide-react";
+import Link from "next/link";
+import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { getIITById } from "@/data/iits";
 import { Badge } from "@/components/ui/Badge";
@@ -77,6 +78,17 @@ export function UserMenu({ fullWidth = false }: { fullWidth?: boolean }) {
               </p>
             )}
           </div>
+          {user.role === "ADMIN" && (
+            <Link
+              href="/admin"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2 border-b border-border px-4 py-2.5 text-left text-sm text-muted transition-colors hover:bg-card-hover hover:text-foreground"
+            >
+              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+              Admin dashboard
+            </Link>
+          )}
           <button
             type="button"
             role="menuitem"
