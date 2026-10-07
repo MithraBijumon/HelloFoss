@@ -4,8 +4,15 @@ import { Download } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { UsersTable } from "@/components/admin/UsersTable";
 import { MailSendersPanel } from "@/components/admin/MailSendersPanel";
-import { getAdminSession, getAdminUsers, getAdminMailSenders } from "@/lib/admin";
-import { projects } from "@/data/projects";
+import { ProjectsPanel } from "@/components/admin/ProjectsPanel";
+import { MentorsPanel } from "@/components/admin/MentorsPanel";
+import {
+  getAdminSession,
+  getAdminUsers,
+  getAdminMailSenders,
+  getAdminProjects,
+  getAdminMentors,
+} from "@/lib/admin";
 import { iits } from "@/data/iits";
 import { buttonBaseClasses, buttonVariantClasses, buttonSizeClasses } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -29,26 +36,32 @@ export default async function AdminPage() {
   // Non-admins get a plain 404 so the page's existence isn't advertised.
   if (!(await getAdminSession())) notFound();
 
-  const [users, mailSenders] = await Promise.all([getAdminUsers(), getAdminMailSenders()]);
+  const [users, mailSenders, projects, mentors] = await Promise.all([
+    getAdminUsers(),
+    getAdminMailSenders(),
+    getAdminProjects(),
+    getAdminMentors(),
+  ]);
+  const iitOptions = iits.map((i) => ({ id: i.id, name: i.shortName }));
   const envMailConfigured = Boolean(process.env.GAS_MAIL_WEBHOOK_URL && process.env.GAS_MAIL_SECRET);
   const students = users.filter((u) => u.role === "STUDENT");
   const verified = students.filter((u) => u.verified);
   const withProject = students.filter((u) => u.projects.length > 0);
   const registrationCount = users.reduce((n, u) => n + u.projects.length, 0);
 
-  // Projects from data/projects.ts, plus any slugs that only exist in registrations.
-  const projectCounts = new Map<string, { name: string; track?: string; host?: string; count: number }>();
+  // Every project, plus any slugs that only exist in registrations.
+  const projectCounts = new Map<string, { name: string; status: string; host?: string; count: number }>();
   for (const p of projects) {
     projectCounts.set(p.slug, {
       name: p.name,
-      track: p.track,
+      status: p.published ? "Live" : "Hidden",
       host: iits.find((i) => i.id === p.iitId)?.shortName,
       count: 0,
     });
   }
   for (const u of users) {
     for (const p of u.projects) {
-      const entry = projectCounts.get(p.slug) ?? { name: p.name, count: 0 };
+      const entry = projectCounts.get(p.slug) ?? { name: p.name, status: "Deleted", count: 0 };
       entry.count += 1;
       projectCounts.set(p.slug, entry);
     }
@@ -93,7 +106,7 @@ export default async function AdminPage() {
           <h2 className="text-lg font-semibold">By project</h2>
           {projectRows.length === 0 ? (
             <p className="mt-4 rounded-lg border border-dashed border-border-strong px-4 py-8 text-center text-sm text-muted">
-              No projects published yet. Add them in <code className="font-mono">data/projects.ts</code>.
+              No projects yet. Add them in the Projects section below.
             </p>
           ) : (
             <div className="mt-4 overflow-x-auto rounded-lg border border-border">
@@ -101,7 +114,7 @@ export default async function AdminPage() {
                 <thead className="bg-card">
                   <tr className="border-b border-border font-mono text-xs uppercase tracking-widest text-muted-subtle">
                     <th className="px-4 py-3 font-normal">Project</th>
-                    <th className="px-4 py-3 font-normal">Track</th>
+                    <th className="px-4 py-3 font-normal">Status</th>
                     <th className="px-4 py-3 text-right font-normal">Students</th>
                   </tr>
                 </thead>
@@ -112,7 +125,7 @@ export default async function AdminPage() {
                         <span className="font-medium">{p.name}</span>
                         {p.host && <span className="block text-xs text-muted-subtle">{p.host}</span>}
                       </td>
-                      <td className="px-4 py-3 text-muted">{p.track ?? "removed"}</td>
+                      <td className="px-4 py-3 text-muted">{p.status}</td>
                       <td className="px-4 py-3 text-right font-mono">{p.count}</td>
                     </tr>
                   ))}
@@ -148,6 +161,20 @@ export default async function AdminPage() {
           </div>
         </section>
       </div>
+
+      <section className="mt-12">
+        <h2 className="text-lg font-semibold">Projects</h2>
+        <ProjectsPanel
+          initialProjects={projects}
+          iits={iitOptions}
+          mentors={mentors.map((m) => ({ id: m.id, name: m.name }))}
+        />
+      </section>
+
+      <section className="mt-12">
+        <h2 className="text-lg font-semibold">Mentors</h2>
+        <MentorsPanel mentors={mentors} iits={iitOptions} />
+      </section>
 
       <section className="mt-12">
         <h2 className="text-lg font-semibold">Mail senders</h2>

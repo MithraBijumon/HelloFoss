@@ -19,7 +19,8 @@ type Sender = {
 
 type MailerResponse = { ok: boolean; error?: string; remaining?: number };
 
-const MAILER_TIMEOUT_MS = 15_000;
+// Apps Script cold starts plus a MailApp send can take well over 10s.
+const MAILER_TIMEOUT_MS = 30_000;
 
 /** Apps Script web app URLs look like https://script.google.com/macros/s/<id>/exec. */
 export function isValidWebhookUrl(url: string): boolean {

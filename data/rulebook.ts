@@ -1,4 +1,8 @@
 import type { RuleSection } from "@/lib/types";
+import { institutePrizes, overallBonuses, formatInr } from "@/data/prizes";
+
+const list = (prizes: { amount: number }[]) =>
+  `${prizes.slice(0, -1).map((p) => formatInr(p.amount)).join(", ")} and ${formatInr(prizes.at(-1)!.amount)}`;
 
 /**
  * Hello FOSS 2026 Contributor Rulebook. All rules are confirmed. To mark a
@@ -186,6 +190,8 @@ export const rulebook: RuleSection[] = [
       "The PR must be linked to an issue that was assigned to you.",
       "Volume means meaningful change, not line count. Splitting one fix into many PRs, padding code, or trivial edits won't be scored.",
       "Mentors' scoring decisions are final; organisers handle disputes.",
+      `Prizes are awarded separately at each participating IIT: ${list(institutePrizes)} for 1st, 2nd and 3rd place.`,
+      `The overall top three are chosen from the institute-level winners and earn an extra ${list(overallBonuses)} on top of their institute prize.`,
     ],
   },
   {

@@ -3,7 +3,7 @@ import { Info } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Container } from "@/components/ui/Container";
 import { ProjectsExplorer } from "@/components/projects/ProjectsExplorer";
-import { projects, getAllTechnologies } from "@/data/projects";
+import { getProjects, getTechnologies } from "@/lib/projects";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -11,8 +11,9 @@ export const metadata: Metadata = {
     "Browse open-source projects across participating IITs. Filter by institute and technology.",
 };
 
-export default function ProjectsPage() {
-  const technologies = getAllTechnologies();
+export default async function ProjectsPage() {
+  const projects = await getProjects();
+  const technologies = getTechnologies(projects);
 
   return (
     <>

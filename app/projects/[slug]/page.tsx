@@ -6,13 +6,8 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { RegisterButton } from "@/components/projects/RegisterButton";
-import { projects, getProjectBySlug } from "@/data/projects";
+import { getProjectBySlug } from "@/lib/projects";
 import { getIITById } from "@/data/iits";
-import { getMentorById } from "@/data/mentors";
-
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
-}
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
@@ -22,7 +17,7 @@ export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
   if (!project) return {};
   return {
     title: project.name,
@@ -32,14 +27,12 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
-  const project = getProjectBySlug(slug);
+  const project = await getProjectBySlug(slug);
 
   if (!project) notFound();
 
   const iit = getIITById(project.iitId);
-  const mentors = project.mentorIds
-    .map((id) => getMentorById(id))
-    .filter((m): m is NonNullable<typeof m> => Boolean(m));
+  const mentors = project.mentors;
 
   return (
     <>

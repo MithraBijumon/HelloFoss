@@ -69,6 +69,45 @@ model MailSender {
   updatedAt   DateTime  @updatedAt
 }
 
+/// A project mentor, managed from /admin. Projects list their mentors in
+/// `Project.mentorIds`.
+model Mentor {
+  id        String   @id @default(cuid())
+  name      String
+  iitId     String
+  bio       String
+  expertise String[]
+  /// GitHub username (not a URL).
+  github    String?
+  /// Lowercased. Registering with this email grants the MENTOR role.
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// A participating repository, managed from /admin. Registrations refer to
+/// it by `slug` (not a foreign key), so renaming a slug must update them too.
+model Project {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  description      String
+  longDescription  String?
+  iitId            String
+  track            String   @default("Beginner")
+  technologies     String[]
+  /// Ids from data/mentors.ts.
+  mentorIds        String[]
+  repositoryUrl    String?
+  documentationUrl String?
+  issuesUrl        String?
+  featured         Boolean  @default(false)
+  /// Unpublished projects are hidden from the site but kept for editing.
+  published        Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
 model Registration {
   id          String   @id @default(cuid())
   userId      String

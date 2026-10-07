@@ -4,10 +4,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { MentorCard } from "@/components/mentors/MentorCard";
-import { mentors } from "@/data/mentors";
+import { getProjects, getMentorProjectNames } from "@/lib/projects";
+import { getMentors } from "@/lib/mentors";
 
-export function MentorsPreview() {
+export async function MentorsPreview() {
+  const [mentors, projects] = await Promise.all([getMentors(), getProjects()]);
   const preview = mentors.slice(0, 3);
+  const projectNames = getMentorProjectNames(projects);
 
   return (
     <section className="border-b border-border py-20 sm:py-24">
@@ -26,7 +29,7 @@ export function MentorsPreview() {
         {preview.length > 0 ? (
           <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {preview.map((mentor) => (
-              <MentorCard key={mentor.id} mentor={mentor} />
+              <MentorCard key={mentor.id} mentor={mentor} projectNames={projectNames[mentor.id]} />
             ))}
           </div>
         ) : (

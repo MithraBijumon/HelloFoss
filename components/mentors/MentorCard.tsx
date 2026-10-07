@@ -2,11 +2,9 @@ import { UserRound } from "lucide-react";
 import { GithubIcon } from "@/components/ui/SocialIcons";
 import type { Mentor } from "@/lib/types";
 import { getIITById } from "@/data/iits";
-import { projects } from "@/data/projects";
 
-export function MentorCard({ mentor }: { mentor: Mentor }) {
+export function MentorCard({ mentor, projectNames = [] }: { mentor: Mentor; projectNames?: string[] }) {
   const iit = getIITById(mentor.iitId);
-  const mentorProjects = projects.filter((p) => mentor.projectIds.includes(p.id));
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6">
@@ -22,9 +20,10 @@ export function MentorCard({ mentor }: { mentor: Mentor }) {
 
       <p className="text-sm leading-relaxed text-muted">{mentor.bio}</p>
 
-      {mentorProjects.length > 0 && (
+      {projectNames.length > 0 && (
         <p className="text-sm text-muted-subtle">
-          Project: <span className="text-foreground">{mentorProjects[0].name}</span>
+          {projectNames.length === 1 ? "Project" : "Projects"}:{" "}
+          <span className="text-foreground">{projectNames.join(", ")}</span>
         </p>
       )}
 
@@ -41,7 +40,7 @@ export function MentorCard({ mentor }: { mentor: Mentor }) {
 
       {mentor.github && (
         <a
-          href={mentor.github}
+          href={`https://github.com/${mentor.github}`}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:underline"

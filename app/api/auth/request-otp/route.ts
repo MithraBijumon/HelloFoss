@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { createOtp, hasActiveOtpCooldown } from "@/lib/auth";
 import { canSendOtp, sendOtpEmail } from "@/lib/email";
 import { iits, findIITByEmail } from "@/data/iits";
-import { mentors } from "@/data/mentors";
+import { getMentorByEmail } from "@/lib/mentors";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   const isAdmin = adminEmails().includes(email);
-  const mentor = mentors.find((m) => m.email?.toLowerCase() === email);
+  const mentor = await getMentorByEmail(email);
 
   let role: "STUDENT" | "MENTOR" | "ADMIN" = "STUDENT";
   let resolvedIitId: string | null = null;

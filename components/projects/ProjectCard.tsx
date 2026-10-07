@@ -2,15 +2,12 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/lib/types";
 import { getIITById } from "@/data/iits";
-import { getMentorById } from "@/data/mentors";
 import { Badge } from "@/components/ui/Badge";
 import { RegisterButton } from "@/components/projects/RegisterButton";
 
 export function ProjectCard({ project }: { project: Project }) {
   const iit = getIITById(project.iitId);
-  const mentor = project.mentorIds
-    .map((id) => getMentorById(id))
-    .find(Boolean);
+  const mentor = project.mentors[0];
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 transition-colors hover:border-border-strong">

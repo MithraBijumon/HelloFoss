@@ -14,11 +14,10 @@ export interface Mentor {
   id: string;
   name: string;
   iitId: string;
-  projectIds: string[];
   expertise: string[];
+  /** GitHub username. */
   github?: string;
   bio: string;
-  avatar?: string;
   /** Matched against a verified login email to grant this mentor's account MENTOR access. */
   email?: string;
 }
@@ -33,6 +32,8 @@ export interface Project {
   iitId: string;
   technologies: string[];
   mentorIds: string[];
+  /** Resolved from mentorIds on the server. */
+  mentors: { id: string; name: string }[];
   repositoryUrl?: string;
   documentationUrl?: string;
   issuesUrl?: string;
@@ -61,13 +62,7 @@ export interface FAQ {
   answer: string;
 }
 
-export interface CashPrize {
-  id: string;
-  title: string;
-  /** Left unset ("Amount TBA") until the prize pool is finalized. */
-  amount?: string;
-  description: string;
-}
+
 
 /** A rule marked `provisional` is a proposed default awaiting organiser confirmation. */
 export type Rule = string | { text: string; provisional: true };

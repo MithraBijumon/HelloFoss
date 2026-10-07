@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { getProjectBySlug } from "@/data/projects";
+import { getProjectBySlug } from "@/lib/projects";
 
 const MAX_PROJECTS_PER_STUDENT = 2;
 
@@ -16,11 +16,13 @@ export async function GET() {
     orderBy: { createdAt: "asc" },
   });
 
-  const items = registrations.map((r) => ({
-    projectSlug: r.projectSlug,
-    project: getProjectBySlug(r.projectSlug) ?? null,
-    createdAt: r.createdAt,
-  }));
+  const items = await Promise.all(
+    registrations.map(async (r) => ({
+      projectSlug: r.projectSlug,
+      project: (await getProjectBySlug(r.projectSlug)) ?? null,
+      createdAt: r.createdAt,
+    }))
+  );
 
   return NextResponse.json({ registrations: items });
 }
@@ -34,7 +36,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const projectSlug = typeof body?.projectSlug === "string" ? body.projectSlug : "";
 
-  if (!projectSlug || !getProjectBySlug(projectSlug)) {
+  if (!projectSlug || !(await getProjectBySlug(projectSlug))) {
     return NextResponse.json({ error: "Unknown project." }, { status: 400 });
   }
 

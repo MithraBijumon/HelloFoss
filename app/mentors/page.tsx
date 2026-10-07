@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { Container } from "@/components/ui/Container";
 import { MentorsExplorer } from "@/components/mentors/MentorsExplorer";
-import { mentors } from "@/data/mentors";
+import { getProjects, getMentorProjectNames } from "@/lib/projects";
+import { getMentors } from "@/lib/mentors";
 
 export const metadata: Metadata = {
   title: "Mentors",
@@ -10,7 +11,10 @@ export const metadata: Metadata = {
     "Meet the project maintainers and technical guides behind Hello FOSS projects.",
 };
 
-export default function MentorsPage() {
+export default async function MentorsPage() {
+  const [mentors, projects] = await Promise.all([getMentors(), getProjects()]);
+  const projectNames = getMentorProjectNames(projects);
+
   return (
     <>
       <PageHero
@@ -19,7 +23,7 @@ export default function MentorsPage() {
         description="Mentors prepare repositories, create issues, maintain projects, guide contributors, review pull requests, and maintain project quality."
       />
       <Container className="py-16 sm:py-20">
-        <MentorsExplorer mentors={mentors} />
+        <MentorsExplorer mentors={mentors} projectNames={projectNames} />
       </Container>
     </>
   );

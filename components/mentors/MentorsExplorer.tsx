@@ -8,7 +8,13 @@ import { MentorCard } from "@/components/mentors/MentorCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
 
-export function MentorsExplorer({ mentors }: { mentors: Mentor[] }) {
+export function MentorsExplorer({
+  mentors,
+  projectNames,
+}: {
+  mentors: Mentor[];
+  projectNames: Record<string, string[]>;
+}) {
   const [iit, setIit] = useState<string>("All");
 
   const filtered = useMemo(() => {
@@ -55,7 +61,7 @@ export function MentorsExplorer({ mentors }: { mentors: Mentor[] }) {
       {filtered.length > 0 ? (
         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((mentor) => (
-            <MentorCard key={mentor.id} mentor={mentor} />
+            <MentorCard key={mentor.id} mentor={mentor} projectNames={projectNames[mentor.id]} />
           ))}
         </div>
       ) : (

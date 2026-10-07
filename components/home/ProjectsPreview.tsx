@@ -4,10 +4,11 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProjectCard } from "@/components/projects/ProjectCard";
-import { getFeaturedProjects, projects } from "@/data/projects";
+import { getProjects } from "@/lib/projects";
 
-export function ProjectsPreview() {
-  const featured = getFeaturedProjects();
+export async function ProjectsPreview() {
+  const projects = await getProjects();
+  const featured = projects.filter((p) => p.featured);
   const preview = featured.length > 0 ? featured : projects.slice(0, 3);
 
   return (
