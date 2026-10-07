@@ -121,12 +121,15 @@ function ProjectForm({
       <label className="flex flex-col gap-1 text-sm">
         Full description <span className="text-xs text-muted-subtle">(optional, shown on the project page)</span>
         <textarea
-          rows={4}
+          rows={8}
           maxLength={5000}
           value={values.longDescription}
           onChange={(e) => set("longDescription", e.target.value)}
           className={inputClasses}
         />
+        <span className="text-xs text-muted-subtle">
+          Blank line for a new paragraph, &quot;- &quot; for bullets, *bold*, `code`, [link](https://…)
+        </span>
       </label>
 
       <div className="grid gap-4 sm:grid-cols-2">

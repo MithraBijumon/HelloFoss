@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { RegisterButton } from "@/components/projects/RegisterButton";
+import { FormattedText } from "@/components/ui/FormattedText";
 import { getProjectBySlug } from "@/lib/projects";
 import { getIITById } from "@/data/iits";
 
@@ -89,9 +90,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           {project.longDescription && (
             <div>
               <h2 className="text-xl font-semibold">Overview</h2>
-              <p className="mt-3 text-pretty leading-relaxed text-muted">
-                {project.longDescription}
-              </p>
+              <FormattedText
+                text={project.longDescription}
+                className="mt-3 flex flex-col gap-4 text-pretty leading-relaxed text-muted"
+              />
             </div>
           )}
 
