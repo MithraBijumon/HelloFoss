@@ -10,6 +10,9 @@ datasource db {
 enum Role {
   STUDENT
   MENTOR
+  /// Head of another club: sees sign-up stats, the users table, and can post
+  /// announcements, but has no access to Projects/Mentors/Mail senders.
+  COORDINATOR
   ADMIN
 }
 
@@ -27,6 +30,8 @@ model User {
   otpCodes      OtpCode[]
   sessions      Session[]
   registrations Registration[]
+  conversations Conversation[]
+  sentMessages  Message[]
 }
 
 model OtpCode {
@@ -69,6 +74,17 @@ model MailSender {
   updatedAt   DateTime  @updatedAt
 }
 
+/// The head of another club, invited by email from /admin. Registering with
+/// this email grants the COORDINATOR role (restricted admin access: stats,
+/// users, announcements — no Projects/Mentors/Mail senders).
+model Coordinator {
+  id        String   @id @default(cuid())
+  /// Lowercased. Registering with this email grants the COORDINATOR role.
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+}
+
 /// A project mentor, managed from /admin. Projects list their mentors in
 /// `Project.mentorIds`.
 model Mentor {
@@ -83,6 +99,8 @@ model Mentor {
   email     String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  conversations Conversation[]
 }
 
 /// A participating repository, managed from /admin. Registrations refer to
@@ -117,4 +135,50 @@ model Registration {
 
   @@unique([userId, projectSlug])
   @@index([projectSlug])
+}
+
+/// A DM thread between a user (usually a student) and a mentor. One thread
+/// per pair; `projectSlug` just records which project it was started from.
+model Conversation {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentorId      String
+  mentor        Mentor    @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  projectSlug   String?
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  messages      Message[]
+
+  @@unique([userId, mentorId])
+  @@index([mentorId])
+}
+
+/// A "what's new" post about the Hello FOSS site itself, managed from
+/// /admin and shown on /updates. Not related to a project's own repo.
+model Announcement {
+  id           String   @id @default(cuid())
+  title        String
+  body         String
+  published    Boolean  @default(true)
+  /// Shown in the scrolling banner at the top of every page.
+  showAsBanner Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  /// The User who sent it — either the conversation's student or the user
+  /// account linked to its mentor. Compare against `conversation.userId` to
+  /// tell which side sent a given message.
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body           String
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
 }

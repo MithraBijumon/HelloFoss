@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminSession, getAdminUsers } from "@/lib/admin";
+import { getDashboardSession, getAdminUsers } from "@/lib/admin";
 
 function csvCell(value: string): string {
   // Prefix formula-like values so spreadsheets don't execute user-supplied names.
@@ -8,7 +8,7 @@ function csvCell(value: string): string {
 }
 
 export async function GET() {
-  if (!(await getAdminSession())) {
+  if (!(await getDashboardSession())) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 

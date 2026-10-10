@@ -11,11 +11,41 @@ const selectClasses =
 
 const dateFormat = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
-export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: string[] }) {
+const ASSIGNABLE_ROLES = ["STUDENT", "COORDINATOR", "ADMIN"] as const;
+
+export function UsersTable({
+  users: initialUsers,
+  iits,
+  canManageRoles = false,
+}: {
+  users: AdminUserRow[];
+  iits: string[];
+  canManageRoles?: boolean;
+}) {
+  const [users, setUsers] = useState(initialUsers);
   const [query, setQuery] = useState("");
   const [iit, setIit] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function changeRole(id: string, nextRole: string) {
+    setPendingId(id);
+    setError(null);
+    const res = await fetch(`/api/admin/users/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: nextRole }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setPendingId(null);
+    if (!res.ok) {
+      setError(data.error ?? "Something went wrong.");
+      return;
+    }
+    setUsers(data.users);
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -56,6 +86,7 @@ export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: strin
           <option value="">All roles</option>
           <option value="STUDENT">Students</option>
           <option value="MENTOR">Mentors</option>
+          <option value="COORDINATOR">Coordinators</option>
           <option value="ADMIN">Admins</option>
         </select>
         <select aria-label="Filter by status" value={status} onChange={(e) => setStatus(e.target.value)} className={selectClasses}>
@@ -79,6 +110,7 @@ export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: strin
               <th className="px-4 py-3 font-normal">Projects</th>
               <th className="px-4 py-3 font-normal">Status</th>
               <th className="px-4 py-3 font-normal">Signed up</th>
+              {canManageRoles && <th className="px-4 py-3 font-normal">Role</th>}
             </tr>
           </thead>
           <tbody>
@@ -107,11 +139,32 @@ export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: strin
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-muted">{dateFormat.format(new Date(u.createdAt))}</td>
+                {canManageRoles && (
+                  <td className="px-4 py-3">
+                    {u.role === "MENTOR" ? (
+                      <span className="text-xs text-muted-subtle">via Mentors panel</span>
+                    ) : (
+                      <select
+                        aria-label={`Role for ${u.email}`}
+                        value={u.role}
+                        disabled={pendingId === u.id}
+                        onChange={(e) => changeRole(u.id, e.target.value)}
+                        className={cn(selectClasses, "h-8 text-xs")}
+                      >
+                        {ASSIGNABLE_ROLES.map((r) => (
+                          <option key={r} value={r}>
+                            {r}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-muted">
+                <td colSpan={canManageRoles ? 6 : 5} className="px-4 py-10 text-center text-muted">
                   No users match these filters.
                 </td>
               </tr>
@@ -119,6 +172,7 @@ export function UsersTable({ users, iits }: { users: AdminUserRow[]; iits: strin
           </tbody>
         </table>
       </div>
+      {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
     </div>
   );
 }

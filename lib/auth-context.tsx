@@ -11,7 +11,7 @@ import {
 } from "react";
 import { AuthModal } from "@/components/auth/AuthModal";
 
-export type AuthRole = "STUDENT" | "MENTOR" | "ADMIN";
+export type AuthRole = "STUDENT" | "MENTOR" | "COORDINATOR" | "ADMIN";
 
 export type AuthUser = {
   id: string;

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { AuthProvider } from "@/lib/auth-context";
 import { siteConfig } from "@/data/site";
+import { getBannerAnnouncements } from "@/lib/announcements";
 import "./globals.css";
 
 const inter = Inter({
@@ -17,6 +19,10 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
 });
+
+// Keeps pages that don't otherwise need per-request rendering mostly static;
+// the top-of-site banner just refreshes on this schedule instead of instantly.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -39,7 +45,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const bannerItems = await getBannerAnnouncements();
+
   return (
     <html
       lang="en"
@@ -48,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col font-sans">
         <AuthProvider>
+          <AnnouncementBanner items={bannerItems} />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

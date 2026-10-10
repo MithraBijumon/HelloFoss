@@ -6,8 +6,11 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { RegisterButton } from "@/components/projects/RegisterButton";
+import { MessageMentorButton } from "@/components/messages/MessageMentorButton";
 import { FormattedText } from "@/components/ui/FormattedText";
+import { ActivityList } from "@/components/activity/ActivityList";
 import { getProjectBySlug } from "@/lib/projects";
+import { getRepoActivity } from "@/lib/github";
 import { getIITById } from "@/data/iits";
 
 type ProjectPageProps = {
@@ -34,6 +37,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   const iit = getIITById(project.iitId);
   const mentors = project.mentors;
+  const activity = project.repositoryUrl ? await getRepoActivity(project.repositoryUrl) : [];
 
   return (
     <>
@@ -107,6 +111,15 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               ready to merge.
             </p>
           </div>
+
+          {project.repositoryUrl && (
+            <div>
+              <h2 className="text-xl font-semibold">Recent Activity</h2>
+              <div className="mt-3">
+                <ActivityList items={activity} emptyLabel="No recent activity found for this repository." />
+              </div>
+            </div>
+          )}
         </div>
 
         <aside className="flex flex-col gap-6">
@@ -143,13 +156,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </h3>
               <ul className="mt-3 flex flex-col gap-2">
                 {mentors.map((mentor) => (
-                  <li key={mentor.id}>
+                  <li key={mentor.id} className="flex items-center justify-between gap-3">
                     <Link
                       href="/mentors"
                       className="text-sm font-medium text-foreground hover:text-accent"
                     >
                       {mentor.name}
                     </Link>
+                    <MessageMentorButton
+                      mentorId={mentor.id}
+                      mentorName={mentor.name}
+                      projectSlug={project.slug}
+                    />
                   </li>
                 ))}
               </ul>

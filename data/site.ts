@@ -12,6 +12,7 @@ export const siteConfig = {
     { label: "Timeline", href: "/timeline" },
     { label: "Rulebook", href: "/rulebook" },
     { label: "Beyond", href: "/programs" },
+    { label: "Updates", href: "/updates" },
     { label: "FAQ", href: "/faq" },
   ],
   footerLinks: [
@@ -20,6 +21,7 @@ export const siteConfig = {
     { label: "Timeline", href: "/timeline" },
     { label: "Rulebook", href: "/rulebook" },
     { label: "Beyond", href: "/programs" },
+    { label: "Updates", href: "/updates" },
     { label: "FAQ", href: "/faq" },
     { label: "Register", href: "#" },
   ],

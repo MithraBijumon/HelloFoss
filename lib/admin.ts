@@ -2,10 +2,20 @@ import { prisma } from "@/lib/db";
 import { getSession, type SessionUser } from "@/lib/auth";
 import { getIITById } from "@/data/iits";
 
-/** Returns the signed-in user only if they're an admin. Role is read fresh from the DB. */
+/** Returns the signed-in user only if they're a full admin. Role is read fresh from the DB. */
 export async function getAdminSession(): Promise<SessionUser | null> {
   const session = await getSession();
   return session?.role === "ADMIN" ? session : null;
+}
+
+/**
+ * Returns the signed-in user if they're an admin or a coordinator (e.g. the
+ * head of another club). Coordinators see stats, users, and announcements,
+ * but never Projects/Mentors/Mail senders — gate those with getAdminSession.
+ */
+export async function getDashboardSession(): Promise<SessionUser | null> {
+  const session = await getSession();
+  return session?.role === "ADMIN" || session?.role === "COORDINATOR" ? session : null;
 }
 
 export type AdminMailSender = {
@@ -40,7 +50,7 @@ export type AdminUserRow = {
   id: string;
   name: string | null;
   email: string;
-  role: "STUDENT" | "MENTOR" | "ADMIN";
+  role: "STUDENT" | "MENTOR" | "COORDINATOR" | "ADMIN";
   iit: string | null;
   /** False until the user finishes OTP verification and sets a password. */
   verified: boolean;
@@ -143,5 +153,52 @@ export async function getAdminMentors(): Promise<AdminMentor[]> {
     github: m.github ?? "",
     email: m.email ?? "",
     projects: projects.filter((p) => p.mentorIds.includes(m.id)).map((p) => p.name),
+  }));
+}
+
+export type AdminCoordinator = {
+  id: string;
+  email: string;
+  name: string | null;
+  createdAt: string;
+  /** The matching account's current role, or null if they haven't signed up yet. */
+  currentRole: string | null;
+};
+
+export async function getAdminCoordinators(): Promise<AdminCoordinator[]> {
+  const rows = await prisma.coordinator.findMany({ orderBy: { createdAt: "asc" } });
+  const users = await prisma.user.findMany({
+    where: { email: { in: rows.map((r) => r.email) } },
+    select: { email: true, role: true },
+  });
+  const roleByEmail = new Map(users.map((u) => [u.email, u.role]));
+
+  return rows.map((r) => ({
+    id: r.id,
+    email: r.email,
+    name: r.name,
+    createdAt: r.createdAt.toISOString(),
+    currentRole: roleByEmail.get(r.email) ?? null,
+  }));
+}
+
+export type AdminAnnouncement = {
+  id: string;
+  title: string;
+  body: string;
+  published: boolean;
+  showAsBanner: boolean;
+  createdAt: string;
+};
+
+export async function getAdminAnnouncements(): Promise<AdminAnnouncement[]> {
+  const rows = await prisma.announcement.findMany({ orderBy: { createdAt: "desc" } });
+  return rows.map((a) => ({
+    id: a.id,
+    title: a.title,
+    body: a.body,
+    published: a.published,
+    showAsBanner: a.showAsBanner,
+    createdAt: a.createdAt.toISOString(),
   }));
 }

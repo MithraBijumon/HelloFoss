@@ -4,6 +4,7 @@ import { createOtp, hasActiveOtpCooldown } from "@/lib/auth";
 import { canSendOtp, sendOtpEmail } from "@/lib/email";
 import { iits, findIITByEmail } from "@/data/iits";
 import { getMentorByEmail } from "@/lib/mentors";
+import { getCoordinatorByEmail } from "@/lib/coordinators";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,8 +44,9 @@ export async function POST(request: Request) {
 
   const isAdmin = adminEmails().includes(email);
   const mentor = await getMentorByEmail(email);
+  const coordinator = await getCoordinatorByEmail(email);
 
-  let role: "STUDENT" | "MENTOR" | "ADMIN" = "STUDENT";
+  let role: "STUDENT" | "MENTOR" | "COORDINATOR" | "ADMIN" = "STUDENT";
   let resolvedIitId: string | null = null;
   let mentorId: string | null = null;
 
@@ -58,6 +60,10 @@ export async function POST(request: Request) {
     role = "MENTOR";
     mentorId = mentor.id;
     resolvedIitId = mentor.iitId;
+  } else if (coordinator) {
+    // Club heads may not have an institute email, same as admins.
+    role = "COORDINATOR";
+    resolvedIitId = matchedIit?.id ?? null;
   } else {
     if (!matchedIit) {
       const domains = iits.flatMap((iit) => iit.emailDomains).join(", ");

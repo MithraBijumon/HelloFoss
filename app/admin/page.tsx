@@ -6,12 +6,16 @@ import { UsersTable } from "@/components/admin/UsersTable";
 import { MailSendersPanel } from "@/components/admin/MailSendersPanel";
 import { ProjectsPanel } from "@/components/admin/ProjectsPanel";
 import { MentorsPanel } from "@/components/admin/MentorsPanel";
+import { AnnouncementsPanel } from "@/components/admin/AnnouncementsPanel";
+import { CoordinatorsPanel } from "@/components/admin/CoordinatorsPanel";
 import {
-  getAdminSession,
+  getDashboardSession,
   getAdminUsers,
   getAdminMailSenders,
   getAdminProjects,
   getAdminMentors,
+  getAdminAnnouncements,
+  getAdminCoordinators,
 } from "@/lib/admin";
 import { iits } from "@/data/iits";
 import { buttonBaseClasses, buttonVariantClasses, buttonSizeClasses } from "@/components/ui/Button";
@@ -33,14 +37,18 @@ function Stat({ label, value, hint }: { label: string; value: number; hint?: str
 }
 
 export default async function AdminPage() {
-  // Non-admins get a plain 404 so the page's existence isn't advertised.
-  if (!(await getAdminSession())) notFound();
+  // Neither admins nor coordinators: a plain 404 so the page's existence isn't advertised.
+  const session = await getDashboardSession();
+  if (!session) notFound();
+  const isAdmin = session.role === "ADMIN";
 
-  const [users, mailSenders, projects, mentors] = await Promise.all([
+  const [users, projects, announcements, mailSenders, mentors, coordinators] = await Promise.all([
     getAdminUsers(),
-    getAdminMailSenders(),
     getAdminProjects(),
-    getAdminMentors(),
+    getAdminAnnouncements(),
+    isAdmin ? getAdminMailSenders() : Promise.resolve([]),
+    isAdmin ? getAdminMentors() : Promise.resolve([]),
+    isAdmin ? getAdminCoordinators() : Promise.resolve([]),
   ]);
   const iitOptions = iits.map((i) => ({ id: i.id, name: i.shortName }));
   const envMailConfigured = Boolean(process.env.GAS_MAIL_WEBHOOK_URL && process.env.GAS_MAIL_SECRET);
@@ -82,7 +90,9 @@ export default async function AdminPage() {
     <Container className="py-12 sm:py-16">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="font-mono text-xs uppercase tracking-widest text-accent">Admin</p>
+          <p className="font-mono text-xs uppercase tracking-widest text-accent">
+            {isAdmin ? "Admin" : "Coordinator"}
+          </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Dashboard</h1>
         </div>
         <a
@@ -162,28 +172,46 @@ export default async function AdminPage() {
         </section>
       </div>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold">Projects</h2>
-        <ProjectsPanel
-          initialProjects={projects}
-          iits={iitOptions}
-          mentors={mentors.map((m) => ({ id: m.id, name: m.name }))}
-        />
-      </section>
+      {isAdmin && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">Projects</h2>
+          <ProjectsPanel
+            initialProjects={projects}
+            iits={iitOptions}
+            mentors={mentors.map((m) => ({ id: m.id, name: m.name }))}
+          />
+        </section>
+      )}
+
+      {isAdmin && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">Mentors</h2>
+          <MentorsPanel mentors={mentors} iits={iitOptions} />
+        </section>
+      )}
+
+      {isAdmin && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">Coordinators</h2>
+          <CoordinatorsPanel initialCoordinators={coordinators} />
+        </section>
+      )}
 
       <section className="mt-12">
-        <h2 className="text-lg font-semibold">Mentors</h2>
-        <MentorsPanel mentors={mentors} iits={iitOptions} />
+        <h2 className="text-lg font-semibold">Announcements</h2>
+        <AnnouncementsPanel initialAnnouncements={announcements} />
       </section>
 
-      <section className="mt-12">
-        <h2 className="text-lg font-semibold">Mail senders</h2>
-        <MailSendersPanel initialSenders={mailSenders} envConfigured={envMailConfigured} />
-      </section>
+      {isAdmin && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">Mail senders</h2>
+          <MailSendersPanel initialSenders={mailSenders} envConfigured={envMailConfigured} />
+        </section>
+      )}
 
       <section className="mt-12">
         <h2 className="text-lg font-semibold">All users</h2>
-        <UsersTable users={users} iits={iits.map((i) => i.shortName)} />
+        <UsersTable users={users} iits={iits.map((i) => i.shortName)} canManageRoles={isAdmin} />
       </section>
     </Container>
   );

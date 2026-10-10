@@ -92,3 +92,30 @@ body {
   stroke-dashoffset: 240;
   animation: dash 6s linear infinite;
 }
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* -100% of the element's own box, which includes the 100% left padding
+       below — so it travels fully from the container's right edge to past
+       its left edge. */
+    transform: translateX(-100%);
+  }
+}
+
+.marquee-track {
+  display: inline-block;
+  /* Percentage padding is relative to the containing block's width, so this
+     starts the text flush at the container's right edge regardless of how
+     long the text is. */
+  padding-left: 100%;
+  animation: marquee 15s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
