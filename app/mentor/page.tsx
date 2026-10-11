@@ -4,7 +4,9 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { MessagesPanel } from "@/components/messages/MessagesPanel";
 import { getMentorSession, getMentorProjects } from "@/lib/mentor";
+import { MentorAnnouncementsPanel } from "@/components/mentor/MentorAnnouncementsPanel";
 import { getConversationsForViewer } from "@/lib/messages";
+import { getProjectMentorAnnouncements } from "@/lib/mentor-announcements";
 
 export const metadata: Metadata = {
   title: "Mentor dashboard",
@@ -16,10 +18,12 @@ export default async function MentorPage() {
   // Non-mentors get a plain 404 so the page's existence isn't advertised.
   if (!session || !session.mentorId) notFound();
 
+  const mentorId = session.mentorId;
   const [projects, conversations] = await Promise.all([
-    getMentorProjects(session.mentorId),
+    getMentorProjects(mentorId),
     getConversationsForViewer(session),
   ]);
+  const announcements = await Promise.all(projects.map((p) => getProjectMentorAnnouncements(p.slug)));
 
   return (
     <Container className="py-12 sm:py-16">
@@ -34,7 +38,7 @@ export default async function MentorPage() {
           </p>
         ) : (
           <div className="mt-4 flex flex-col gap-6">
-            {projects.map((p) => (
+            {projects.map((p, i) => (
               <div key={p.slug} className="rounded-lg border border-border bg-card p-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold">{p.name}</h3>
@@ -87,6 +91,13 @@ export default async function MentorPage() {
                     </table>
                   </div>
                 )}
+
+                <MentorAnnouncementsPanel
+                  projectSlug={p.slug}
+                  menteeCount={p.students.length}
+                  mentorId={mentorId}
+                  initialAnnouncements={announcements[i]}
+                />
               </div>
             ))}
           </div>

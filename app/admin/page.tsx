@@ -211,7 +211,13 @@ export default async function AdminPage() {
 
       <section className="mt-12">
         <h2 className="text-lg font-semibold">All users</h2>
-        <UsersTable users={users} iits={iits.map((i) => i.shortName)} canManageRoles={isAdmin} />
+        <UsersTable
+          users={users}
+          iits={iits.map((i) => i.shortName)}
+          canManageRoles={isAdmin}
+          iitOptions={iitOptions}
+          projects={projects.map((p) => ({ id: p.id, name: p.name }))}
+        />
       </section>
     </Container>
   );

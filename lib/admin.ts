@@ -52,6 +52,7 @@ export type AdminUserRow = {
   email: string;
   role: "STUDENT" | "MENTOR" | "COORDINATOR" | "ADMIN";
   iit: string | null;
+  iitId: string | null;
   githubUsername: string | null;
   /** False until the user finishes OTP verification and sets a password. */
   verified: boolean;
@@ -75,6 +76,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
     email: u.email,
     role: u.role,
     iit: u.iitId ? (getIITById(u.iitId)?.shortName ?? u.iitId) : null,
+    iitId: u.iitId,
     githubUsername: u.githubUsername,
     verified: u.passwordHash !== null,
     projects: u.registrations.map((r) => ({

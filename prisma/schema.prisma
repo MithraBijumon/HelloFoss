@@ -103,7 +103,8 @@ model Mentor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  conversations Conversation[]
+  conversations       Conversation[]
+  mentorAnnouncements MentorAnnouncement[]
 }
 
 /// A participating repository, managed from /admin. Registrations refer to
@@ -184,4 +185,19 @@ model Message {
   createdAt      DateTime     @default(now())
 
   @@index([conversationId])
+}
+
+/// A broadcast from a mentor to everyone registered on one of their
+/// projects. Shown on the project page and /messages to those students.
+model MentorAnnouncement {
+  id          String   @id @default(cuid())
+  mentorId    String
+  mentor      Mentor   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  /// Registrations refer to projects by slug too.
+  projectSlug String
+  title       String
+  body        String
+  createdAt   DateTime @default(now())
+
+  @@index([projectSlug])
 }

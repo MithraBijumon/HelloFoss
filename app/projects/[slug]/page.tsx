@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { RegisterButton } from "@/components/projects/RegisterButton";
 import { MessageMentorButton } from "@/components/messages/MessageMentorButton";
 import { FormattedText } from "@/components/ui/FormattedText";
+import { ProjectMentorAnnouncements } from "@/components/projects/ProjectMentorAnnouncements";
 import { ActivityList } from "@/components/activity/ActivityList";
 import { getProjectBySlug } from "@/lib/projects";
 import { getRepoActivity } from "@/lib/github";
@@ -100,6 +101,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               />
             </div>
           )}
+
+          <ProjectMentorAnnouncements projectSlug={project.slug} />
 
           <div>
             <h2 className="text-xl font-semibold">Contributing</h2>

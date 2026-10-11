@@ -3,7 +3,9 @@ import { Container } from "@/components/ui/Container";
 import { SignInButton } from "@/components/auth/SignInButton";
 import { MessagesPanel } from "@/components/messages/MessagesPanel";
 import { getSession } from "@/lib/auth";
+import { MentorAnnouncementList } from "@/components/mentor/MentorAnnouncementList";
 import { getConversationsForViewer } from "@/lib/messages";
+import { getMentorAnnouncementsForStudent } from "@/lib/mentor-announcements";
 
 export const metadata: Metadata = {
   title: "Messages",
@@ -25,7 +27,10 @@ export default async function MessagesPage() {
     );
   }
 
-  const conversations = await getConversationsForViewer(session);
+  const [conversations, announcements] = await Promise.all([
+    getConversationsForViewer(session),
+    getMentorAnnouncementsForStudent(session.id),
+  ]);
   const isMentor = session.role === "MENTOR" && Boolean(session.mentorId);
 
   return (
@@ -39,6 +44,15 @@ export default async function MessagesPage() {
           ? "Messages students have sent you about your projects."
           : "Messages you've sent to project mentors."}
       </p>
+
+      {announcements.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold">Announcements from your mentors</h2>
+          <div className="mt-3">
+            <MentorAnnouncementList items={announcements} showProject />
+          </div>
+        </section>
+      )}
 
       <div className="mt-8">
         <MessagesPanel

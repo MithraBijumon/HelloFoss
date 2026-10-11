@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import type { AdminUserRow } from "@/lib/admin";
 import { Badge } from "@/components/ui/Badge";
+import { buttonBaseClasses, buttonVariantClasses } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
 const selectClasses =
@@ -11,16 +12,20 @@ const selectClasses =
 
 const dateFormat = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
-const ASSIGNABLE_ROLES = ["STUDENT", "COORDINATOR", "ADMIN"] as const;
+const ASSIGNABLE_ROLES = ["STUDENT", "MENTOR", "COORDINATOR", "ADMIN"] as const;
 
 export function UsersTable({
   users: initialUsers,
   iits,
   canManageRoles = false,
+  iitOptions = [],
+  projects = [],
 }: {
   users: AdminUserRow[];
   iits: string[];
   canManageRoles?: boolean;
+  iitOptions?: { id: string; name: string }[];
+  projects?: { id: string; name: string }[];
 }) {
   const [users, setUsers] = useState(initialUsers);
   const [query, setQuery] = useState("");
@@ -29,22 +34,51 @@ export function UsersTable({
   const [status, setStatus] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mentorFor, setMentorFor] = useState<AdminUserRow | null>(null);
+  const [mentorProjectIds, setMentorProjectIds] = useState<string[]>([]);
+  const [mentorIitId, setMentorIitId] = useState("");
 
-  async function changeRole(id: string, nextRole: string) {
+  async function changeRole(
+    id: string,
+    nextRole: string,
+    extra: { projectIds?: string[]; iitId?: string } = {}
+  ): Promise<boolean> {
     setPendingId(id);
     setError(null);
     const res = await fetch(`/api/admin/users/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: nextRole }),
+      body: JSON.stringify({ role: nextRole, ...extra }),
     });
     const data = await res.json().catch(() => ({}));
     setPendingId(null);
     if (!res.ok) {
       setError(data.error ?? "Something went wrong.");
-      return;
+      return false;
     }
     setUsers(data.users);
+    return true;
+  }
+
+  function handleRoleChange(u: AdminUserRow, nextRole: string) {
+    if (nextRole === "MENTOR") {
+      // Mentors need projects to mentor (and an IIT if the account has none), so ask first.
+      setMentorFor(u);
+      setMentorProjectIds([]);
+      setMentorIitId("");
+      setError(null);
+      return;
+    }
+    changeRole(u.id, nextRole);
+  }
+
+  async function confirmMentor() {
+    if (!mentorFor) return;
+    const ok = await changeRole(mentorFor.id, "MENTOR", {
+      projectIds: mentorProjectIds,
+      iitId: mentorFor.iitId ?? mentorIitId,
+    });
+    if (ok) setMentorFor(null);
   }
 
   const filtered = useMemo(() => {
@@ -169,7 +203,7 @@ export function UsersTable({
                         aria-label={`Role for ${u.email}`}
                         value={u.role}
                         disabled={pendingId === u.id}
-                        onChange={(e) => changeRole(u.id, e.target.value)}
+                        onChange={(e) => handleRoleChange(u, e.target.value)}
                         className={cn(selectClasses, "h-8 text-xs")}
                       >
                         {ASSIGNABLE_ROLES.map((r) => (
@@ -194,6 +228,87 @@ export function UsersTable({
         </table>
       </div>
       {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+
+      {mentorFor && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setMentorFor(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Make mentor"
+            className="w-full max-w-sm rounded-lg border border-border bg-card p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="font-semibold">Make {mentorFor.name || mentorFor.email} a mentor</h2>
+
+            <fieldset className="mt-4">
+              <legend className="text-sm">Projects they mentor</legend>
+              <div className="mt-2 flex max-h-48 flex-col gap-1.5 overflow-y-auto rounded-md border border-border p-3">
+                {projects.length === 0 && <p className="text-sm text-muted">No projects yet.</p>}
+                {projects.map((p) => (
+                  <label key={p.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={mentorProjectIds.includes(p.id)}
+                      onChange={(e) =>
+                        setMentorProjectIds((ids) =>
+                          e.target.checked ? [...ids, p.id] : ids.filter((x) => x !== p.id)
+                        )
+                      }
+                    />
+                    {p.name}
+                  </label>
+                ))}
+              </div>
+              <p className="mt-1 text-xs text-muted-subtle">You can change this later in the Projects panel.</p>
+            </fieldset>
+
+            {!mentorFor.iitId && (
+              <label className="mt-4 flex flex-col gap-1.5 text-sm">
+                IIT
+                <select
+                  value={mentorIitId}
+                  onChange={(e) => setMentorIitId(e.target.value)}
+                  className={cn(selectClasses, "w-full")}
+                >
+                  <option value="">Choose…</option>
+                  {iitOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-muted-subtle">
+                  This account has no institute email, so we can&apos;t tell which IIT they&apos;re from. It&apos;s
+                  shown on their card on the Mentors page.
+                </span>
+              </label>
+            )}
+
+            {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+
+            <div className="mt-5 flex gap-2">
+              <button
+                type="button"
+                disabled={pendingId === mentorFor.id}
+                onClick={confirmMentor}
+                className={cn(buttonBaseClasses, buttonVariantClasses.primary, "h-9 px-4 text-sm")}
+              >
+                {pendingId === mentorFor.id ? "Saving…" : "Make mentor"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMentorFor(null)}
+                className={cn(buttonBaseClasses, buttonVariantClasses.ghost, "h-9 px-4 text-sm")}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
