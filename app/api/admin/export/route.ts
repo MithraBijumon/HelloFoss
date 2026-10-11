@@ -13,12 +13,13 @@ export async function GET() {
   }
 
   const users = await getAdminUsers();
-  const header = ["Name", "Email", "Role", "IIT", "Verified", "Projects", "Signed up"];
+  const header = ["Name", "Email", "Role", "IIT", "GitHub", "Verified", "Projects", "Signed up"];
   const rows = users.map((u) => [
     u.name ?? "",
     u.email,
     u.role,
     u.iit ?? "",
+    u.githubUsername ?? "",
     u.verified ? "yes" : "no",
     u.projects.map((p) => p.name).join("; "),
     u.createdAt,

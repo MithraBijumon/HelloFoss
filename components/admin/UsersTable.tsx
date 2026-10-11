@@ -50,7 +50,13 @@ export function UsersTable({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return users.filter((u) => {
-      if (q && !u.email.toLowerCase().includes(q) && !(u.name ?? "").toLowerCase().includes(q)) return false;
+      if (
+        q &&
+        !u.email.toLowerCase().includes(q) &&
+        !(u.name ?? "").toLowerCase().includes(q) &&
+        !(u.githubUsername ?? "").includes(q)
+      )
+        return false;
       if (iit && u.iit !== iit) return false;
       if (role && u.role !== role) return false;
       if (status === "verified" && !u.verified) return false;
@@ -70,7 +76,7 @@ export function UsersTable({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name or email"
+            placeholder="Search name, email or GitHub"
             className={cn(selectClasses, "w-full pl-8")}
           />
         </label>
@@ -102,11 +108,12 @@ export function UsersTable({
       </p>
 
       <div className="mt-3 overflow-x-auto rounded-lg border border-border">
-        <table className="w-full min-w-[44rem] border-collapse text-left text-sm">
+        <table className="w-full min-w-[50rem] border-collapse text-left text-sm">
           <thead className="bg-card">
             <tr className="border-b border-border font-mono text-xs uppercase tracking-widest text-muted-subtle">
               <th className="px-4 py-3 font-normal">User</th>
               <th className="px-4 py-3 font-normal">IIT</th>
+              <th className="px-4 py-3 font-normal">GitHub</th>
               <th className="px-4 py-3 font-normal">Projects</th>
               <th className="px-4 py-3 font-normal">Status</th>
               <th className="px-4 py-3 font-normal">Signed up</th>
@@ -130,6 +137,20 @@ export function UsersTable({
                   </a>
                 </td>
                 <td className="px-4 py-3 text-muted">{u.iit ?? "-"}</td>
+                <td className="px-4 py-3 text-muted">
+                  {u.githubUsername ? (
+                    <a
+                      href={`https://github.com/${u.githubUsername}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground"
+                    >
+                      {u.githubUsername}
+                    </a>
+                  ) : (
+                    "-"
+                  )}
+                </td>
                 <td className="px-4 py-3 text-muted">
                   {u.projects.length ? u.projects.map((p) => <div key={p.slug}>{p.name}</div>) : "-"}
                 </td>
@@ -164,7 +185,7 @@ export function UsersTable({
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={canManageRoles ? 6 : 5} className="px-4 py-10 text-center text-muted">
+                <td colSpan={canManageRoles ? 7 : 6} className="px-4 py-10 text-center text-muted">
                   No users match these filters.
                 </td>
               </tr>

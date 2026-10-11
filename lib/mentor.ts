@@ -13,6 +13,7 @@ export type MentorProjectStudent = {
   name: string | null;
   email: string;
   iit: string | null;
+  github: string | null;
   registeredAt: string;
 };
 
@@ -47,6 +48,7 @@ export async function getMentorProjects(mentorId: string): Promise<MentorProject
       name: r.user.name,
       email: r.user.email,
       iit: r.user.iitId ? (getIITById(r.user.iitId)?.shortName ?? r.user.iitId) : null,
+      github: r.user.githubUsername,
       registeredAt: r.createdAt.toISOString(),
     });
     studentsBySlug.set(r.projectSlug, list);

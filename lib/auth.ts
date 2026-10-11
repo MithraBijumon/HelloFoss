@@ -128,6 +128,7 @@ export type SessionUser = {
   email: string;
   name: string | null;
   iitId: string | null;
+  githubUsername: string | null;
   role: Role;
   mentorId: string | null;
 };
@@ -149,6 +150,7 @@ export async function getSession(): Promise<SessionUser | null> {
     email: session.user.email,
     name: session.user.name,
     iitId: session.user.iitId,
+    githubUsername: session.user.githubUsername,
     role: session.user.role,
     mentorId: session.user.mentorId,
   };

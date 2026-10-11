@@ -52,6 +52,7 @@ export default async function MentorPage() {
                         <tr className="border-b border-border font-mono text-xs uppercase tracking-widest text-muted-subtle">
                           <th className="px-4 py-2 font-normal">Student</th>
                           <th className="px-4 py-2 font-normal">IIT</th>
+                          <th className="px-4 py-2 font-normal">GitHub</th>
                           <th className="px-4 py-2 font-normal">Registered</th>
                         </tr>
                       </thead>
@@ -63,6 +64,20 @@ export default async function MentorPage() {
                               <span className="block text-xs text-muted-subtle">{s.email}</span>
                             </td>
                             <td className="px-4 py-2 text-muted">{s.iit ?? "—"}</td>
+                            <td className="px-4 py-2">
+                              {s.github ? (
+                                <a
+                                  href={`https://github.com/${s.github}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="font-mono text-xs text-muted hover:text-foreground"
+                                >
+                                  {s.github}
+                                </a>
+                              ) : (
+                                <span className="text-muted-subtle">Not added</span>
+                              )}
+                            </td>
                             <td className="px-4 py-2 text-muted">
                               {new Date(s.registeredAt).toLocaleDateString()}
                             </td>

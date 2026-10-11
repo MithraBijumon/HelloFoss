@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { GithubPrompt } from "@/components/auth/GithubPrompt";
 
 export type AuthRole = "STUDENT" | "MENTOR" | "COORDINATOR" | "ADMIN";
 
@@ -18,6 +19,7 @@ export type AuthUser = {
   email: string;
   name: string | null;
   iitId: string | null;
+  githubUsername: string | null;
   role: AuthRole;
   mentorId: string | null;
 };
@@ -171,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={value}>
       {children}
       <AuthModal />
+      <GithubPrompt />
     </AuthContext.Provider>
   );
 }

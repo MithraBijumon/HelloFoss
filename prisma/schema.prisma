@@ -17,21 +17,24 @@ enum Role {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String?
-  iitId         String?
-  role          Role           @default(STUDENT)
-  mentorId      String?
+  id             String         @id @default(cuid())
+  email          String         @unique
+  name           String?
+  iitId          String?
+  /// Lowercased GitHub username, asked for after sign-in. Shown to project
+  /// mentors and admins.
+  githubUsername String?        @unique
+  role           Role           @default(STUDENT)
+  mentorId       String?
   /// Set the first time a user completes OTP verification (registration or
   /// password reset). Null means they've never finished that step yet.
-  passwordHash  String?
-  createdAt     DateTime       @default(now())
-  otpCodes      OtpCode[]
-  sessions      Session[]
-  registrations Registration[]
-  conversations Conversation[]
-  sentMessages  Message[]
+  passwordHash   String?
+  createdAt      DateTime       @default(now())
+  otpCodes       OtpCode[]
+  sessions       Session[]
+  registrations  Registration[]
+  conversations  Conversation[]
+  sentMessages   Message[]
 }
 
 model OtpCode {

@@ -13,6 +13,7 @@ export async function GET() {
       email: session.email,
       name: session.name,
       iitId: session.iitId,
+      githubUsername: session.githubUsername,
       role: session.role,
       mentorId: session.mentorId,
     },
