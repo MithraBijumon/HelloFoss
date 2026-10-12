@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getAdminSession, getAdminMentors } from "@/lib/admin";
-import { parseMentorInput, type MentorInput } from "@/lib/mentor-input";
+import { getAdminSession, getAdminMentors, setMentorProjects } from "@/lib/admin";
+import { parseMentorInput, parseProjectIds, type MentorInput } from "@/lib/mentor-input";
 
 export async function GET() {
   if (!(await getAdminSession())) {
@@ -15,9 +15,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
+  const body = await request.json().catch(() => null);
   let input: MentorInput;
   try {
-    input = parseMentorInput(await request.json().catch(() => null));
+    input = parseMentorInput(body);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Another mentor already uses that email." }, { status: 409 });
   }
 
-  await prisma.mentor.create({ data: input });
+  const mentor = await prisma.mentor.create({ data: input });
+  await setMentorProjects(mentor.id, parseProjectIds(body));
   return NextResponse.json({ mentors: await getAdminMentors() });
 }

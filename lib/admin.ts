@@ -141,12 +141,13 @@ export type AdminMentor = {
   email: string;
   /** Names of the projects (published or not) that list this mentor. */
   projects: string[];
+  projectIds: string[];
 };
 
 export async function getAdminMentors(): Promise<AdminMentor[]> {
   const [rows, projects] = await Promise.all([
     prisma.mentor.findMany({ orderBy: { createdAt: "asc" } }),
-    prisma.project.findMany({ select: { name: true, mentorIds: true } }),
+    prisma.project.findMany({ select: { id: true, name: true, mentorIds: true } }),
   ]);
   return rows.map((m) => ({
     id: m.id,
@@ -157,7 +158,21 @@ export async function getAdminMentors(): Promise<AdminMentor[]> {
     github: m.github ?? "",
     email: m.email ?? "",
     projects: projects.filter((p) => p.mentorIds.includes(m.id)).map((p) => p.name),
+    projectIds: projects.filter((p) => p.mentorIds.includes(m.id)).map((p) => p.id),
   }));
+}
+
+/** Makes `projectIds` the exact set of projects that list this mentor. */
+export async function setMentorProjects(mentorId: string, projectIds: string[]) {
+  const projects = await prisma.project.findMany({ select: { id: true, mentorIds: true } });
+  const wanted = new Set(projectIds);
+  const updates = projects.flatMap((p) => {
+    const has = p.mentorIds.includes(mentorId);
+    if (wanted.has(p.id) === has) return [];
+    const mentorIds = has ? p.mentorIds.filter((m) => m !== mentorId) : [...p.mentorIds, mentorId];
+    return [prisma.project.update({ where: { id: p.id }, data: { mentorIds } })];
+  });
+  if (updates.length > 0) await prisma.$transaction(updates);
 }
 
 export type AdminCoordinator = {

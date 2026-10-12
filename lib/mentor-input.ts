@@ -24,6 +24,12 @@ function githubUsername(value: unknown): string | null {
   return v;
 }
 
+/** Ids of the projects the mentor should be on (checked against the DB by the route). */
+export function parseProjectIds(body: unknown): string[] {
+  const raw = ((body ?? {}) as Record<string, unknown>).projectIds;
+  return Array.isArray(raw) ? [...new Set(raw.map(str).filter(Boolean))] : [];
+}
+
 /** Validates the admin mentor form. Throws an Error with a user-facing message. */
 export function parseMentorInput(body: unknown): MentorInput {
   const b = (body ?? {}) as Record<string, unknown>;
@@ -36,7 +42,6 @@ export function parseMentorInput(body: unknown): MentorInput {
   if (!getIITById(iitId)) throw new Error("Choose the mentor's IIT.");
 
   const bio = str(b.bio);
-  if (!bio) throw new Error("Add a short bio.");
   if (bio.length > 500) throw new Error("Keep the bio under 500 characters.");
 
   const rawExpertise = Array.isArray(b.expertise) ? b.expertise : str(b.expertise).split(",");

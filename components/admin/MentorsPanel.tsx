@@ -20,17 +20,20 @@ type FormValues = {
   expertise: string;
   github: string;
   email: string;
+  projectIds: string[];
 };
 
 function MentorForm({
   initial,
   iits,
+  projects,
   submitLabel,
   onSubmit,
   onCancel,
 }: {
   initial?: AdminMentor;
   iits: Option[];
+  projects: Option[];
   submitLabel: string;
   onSubmit: (values: FormValues) => Promise<string | null>;
   onCancel: () => void;
@@ -42,11 +45,12 @@ function MentorForm({
     expertise: (initial?.expertise ?? []).join(", "),
     github: initial?.github ?? "",
     email: initial?.email ?? "",
+    projectIds: initial?.projectIds ?? [],
   });
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  function set<K extends keyof FormValues>(key: K, value: string) {
+  function set(key: Exclude<keyof FormValues, "projectIds">, value: string) {
     setValues((v) => ({ ...v, [key]: value }));
   }
 
@@ -80,9 +84,8 @@ function MentorForm({
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        Bio
+        Bio <span className="text-xs text-muted-subtle">(optional)</span>
         <textarea
-          required
           rows={2}
           maxLength={500}
           value={values.bio}
@@ -91,6 +94,33 @@ function MentorForm({
           className={inputClasses}
         />
       </label>
+
+      <fieldset className="flex flex-col gap-2 text-sm">
+        <legend className="mb-1">
+          Projects <span className="text-xs text-muted-subtle">(optional)</span>
+        </legend>
+        {projects.length === 0 ? (
+          <p className="text-xs text-muted-subtle">No projects yet. Add one in the Projects section first.</p>
+        ) : (
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {projects.map((p) => (
+              <label key={p.id} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={values.projectIds.includes(p.id)}
+                  onChange={(e) =>
+                    setValues((v) => ({
+                      ...v,
+                      projectIds: e.target.checked ? [...v.projectIds, p.id] : v.projectIds.filter((id) => id !== p.id),
+                    }))
+                  }
+                />
+                {p.name}
+              </label>
+            ))}
+          </div>
+        )}
+      </fieldset>
 
       <label className="flex flex-col gap-1 text-sm">
         Expertise <span className="text-xs text-muted-subtle">(comma-separated)</span>
@@ -138,7 +168,15 @@ function MentorForm({
   );
 }
 
-export function MentorsPanel({ mentors, iits }: { mentors: AdminMentor[]; iits: Option[] }) {
+export function MentorsPanel({
+  mentors,
+  iits,
+  projects,
+}: {
+  mentors: AdminMentor[];
+  iits: Option[];
+  projects: Option[];
+}) {
   const router = useRouter();
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -168,6 +206,7 @@ export function MentorsPanel({ mentors, iits }: { mentors: AdminMentor[]; iits: 
               <MentorForm
                 initial={mentor}
                 iits={iits}
+                projects={projects}
                 submitLabel="Save changes"
                 onCancel={() => setEditingId(null)}
                 onSubmit={async (values) => {
@@ -214,7 +253,7 @@ export function MentorsPanel({ mentors, iits }: { mentors: AdminMentor[]; iits: 
 
       {mentors.length === 0 && !adding && (
         <p className="rounded-lg border border-dashed border-border-strong px-4 py-8 text-center text-sm text-muted">
-          No mentors yet. Add one, then tick them on a project to show them as its mentor.
+          No mentors yet. Add one and pick their project.
         </p>
       )}
 
@@ -224,6 +263,7 @@ export function MentorsPanel({ mentors, iits }: { mentors: AdminMentor[]; iits: 
         {adding ? (
           <MentorForm
             iits={iits}
+            projects={projects}
             submitLabel="Add mentor"
             onCancel={() => setAdding(false)}
             onSubmit={async (values) => {

@@ -22,7 +22,7 @@ export function MentorCard({ mentor, projectNames = [] }: { mentor: Mentor; proj
         <MessageMentorButton mentorId={mentor.id} mentorName={mentor.name} />
       </div>
 
-      <p className="text-sm leading-relaxed text-muted">{mentor.bio}</p>
+      {mentor.bio && <p className="text-sm leading-relaxed text-muted">{mentor.bio}</p>}
 
       {projectNames.length > 0 && (
         <p className="text-sm text-muted-subtle">

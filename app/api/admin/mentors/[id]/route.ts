@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getAdminSession, getAdminMentors } from "@/lib/admin";
-import { parseMentorInput, type MentorInput } from "@/lib/mentor-input";
+import { getAdminSession, getAdminMentors, setMentorProjects } from "@/lib/admin";
+import { parseMentorInput, parseProjectIds, type MentorInput } from "@/lib/mentor-input";
 
 const notFound = () => NextResponse.json({ error: "Not found." }, { status: 404 });
 
@@ -11,9 +11,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (!(await prisma.mentor.findUnique({ where: { id } }))) return notFound();
 
+  const body = await request.json().catch(() => null);
   let input: MentorInput;
   try {
-    input = parseMentorInput(await request.json().catch(() => null));
+    input = parseMentorInput(body);
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
@@ -26,6 +27,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   await prisma.mentor.update({ where: { id }, data: input });
+  await setMentorProjects(id, parseProjectIds(body));
   return NextResponse.json({ mentors: await getAdminMentors() });
 }
 

@@ -186,7 +186,11 @@ export default async function AdminPage() {
       {isAdmin && (
         <section className="mt-12">
           <h2 className="text-lg font-semibold">Mentors</h2>
-          <MentorsPanel mentors={mentors} iits={iitOptions} />
+          <MentorsPanel
+            mentors={mentors}
+            iits={iitOptions}
+            projects={projects.map((p) => ({ id: p.id, name: p.name }))}
+          />
         </section>
       )}
 
