@@ -243,6 +243,35 @@ export async function getAdminConversations(): Promise<AdminConversation[]> {
   }));
 }
 
+export type AdminMentorAnnouncement = {
+  id: string;
+  mentorName: string;
+  projectName: string;
+  title: string;
+  body: string;
+  createdAt: string;
+};
+
+/** Every announcement posted by a mentor, across all projects, newest first. */
+export async function getAdminMentorAnnouncements(): Promise<AdminMentorAnnouncement[]> {
+  const [rows, projects] = await Promise.all([
+    prisma.mentorAnnouncement.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { mentor: { select: { name: true } } },
+    }),
+    prisma.project.findMany({ select: { slug: true, name: true } }),
+  ]);
+  const projectNames = new Map(projects.map((p) => [p.slug, p.name]));
+  return rows.map((r) => ({
+    id: r.id,
+    mentorName: r.mentor.name,
+    projectName: projectNames.get(r.projectSlug) ?? r.projectSlug,
+    title: r.title,
+    body: r.body,
+    createdAt: r.createdAt.toISOString(),
+  }));
+}
+
 export type AdminAnnouncement = {
   id: string;
   title: string;

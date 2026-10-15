@@ -9,6 +9,7 @@ import { MentorsPanel } from "@/components/admin/MentorsPanel";
 import { AnnouncementsPanel } from "@/components/admin/AnnouncementsPanel";
 import { CoordinatorsPanel } from "@/components/admin/CoordinatorsPanel";
 import { MessagesOverview } from "@/components/admin/MessagesOverview";
+import { MentorAnnouncementsOverview } from "@/components/admin/MentorAnnouncementsOverview";
 import {
   getDashboardSession,
   getAdminUsers,
@@ -18,6 +19,7 @@ import {
   getAdminAnnouncements,
   getAdminCoordinators,
   getAdminConversations,
+  getAdminMentorAnnouncements,
 } from "@/lib/admin";
 import { iits } from "@/data/iits";
 import { buttonBaseClasses, buttonVariantClasses, buttonSizeClasses } from "@/components/ui/Button";
@@ -44,7 +46,7 @@ export default async function AdminPage() {
   if (!session) notFound();
   const isAdmin = session.role === "ADMIN";
 
-  const [users, projects, announcements, mailSenders, mentors, coordinators, conversations] = await Promise.all([
+  const [users, projects, announcements, mailSenders, mentors, coordinators, conversations, mentorAnnouncements] = await Promise.all([
     getAdminUsers(),
     getAdminProjects(),
     getAdminAnnouncements(),
@@ -52,6 +54,7 @@ export default async function AdminPage() {
     isAdmin ? getAdminMentors() : Promise.resolve([]),
     isAdmin ? getAdminCoordinators() : Promise.resolve([]),
     isAdmin ? getAdminConversations() : Promise.resolve([]),
+    isAdmin ? getAdminMentorAnnouncements() : Promise.resolve([]),
   ]);
   const iitOptions = iits.map((i) => ({ id: i.id, name: i.shortName }));
   const envMailConfigured = Boolean(process.env.GAS_MAIL_WEBHOOK_URL && process.env.GAS_MAIL_SECRET);
@@ -213,6 +216,13 @@ export default async function AdminPage() {
         <section className="mt-12">
           <h2 className="text-lg font-semibold">Messages</h2>
           <MessagesOverview conversations={conversations} />
+        </section>
+      )}
+
+      {isAdmin && (
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold">Mentor announcements</h2>
+          <MentorAnnouncementsOverview announcements={mentorAnnouncements} />
         </section>
       )}
 
