@@ -201,6 +201,48 @@ export async function getAdminCoordinators(): Promise<AdminCoordinator[]> {
   }));
 }
 
+export type AdminConversation = {
+  id: string;
+  studentName: string;
+  studentEmail: string;
+  mentorName: string;
+  projectName: string | null;
+  lastMessageAt: string;
+  messages: { id: string; body: string; createdAt: string; fromStudent: boolean }[];
+};
+
+/** Every student/mentor conversation with its full message history, newest activity first. */
+export async function getAdminConversations(): Promise<AdminConversation[]> {
+  const conversations = await prisma.conversation.findMany({
+    orderBy: { lastMessageAt: "desc" },
+    include: {
+      user: { select: { name: true, email: true } },
+      mentor: { select: { name: true } },
+      messages: { orderBy: { createdAt: "asc" } },
+    },
+  });
+  const slugs = [...new Set(conversations.flatMap((c) => (c.projectSlug ? [c.projectSlug] : [])))];
+  const projects = slugs.length
+    ? await prisma.project.findMany({ where: { slug: { in: slugs } }, select: { slug: true, name: true } })
+    : [];
+  const projectNames = new Map(projects.map((p) => [p.slug, p.name]));
+
+  return conversations.map((c) => ({
+    id: c.id,
+    studentName: c.user.name || c.user.email,
+    studentEmail: c.user.email,
+    mentorName: c.mentor.name,
+    projectName: c.projectSlug ? (projectNames.get(c.projectSlug) ?? c.projectSlug) : null,
+    lastMessageAt: c.lastMessageAt.toISOString(),
+    messages: c.messages.map((m) => ({
+      id: m.id,
+      body: m.body,
+      createdAt: m.createdAt.toISOString(),
+      fromStudent: m.senderId === c.userId,
+    })),
+  }));
+}
+
 export type AdminAnnouncement = {
   id: string;
   title: string;
